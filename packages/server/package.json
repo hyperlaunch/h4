@@ -1,0 +1,17 @@
+{
+	"name": "@h4/server",
+	"exports": {
+		".": "./src/index.ts",
+		"./*": "./src/*.ts"
+	},
+	"type": "module",
+	"dependencies": {
+		"@h4/core": "workspace:*"
+	},
+	"devDependencies": {
+		"@types/bun": "latest"
+	},
+	"peerDependencies": {
+		"typescript": "^5.0.0"
+	}
+}
