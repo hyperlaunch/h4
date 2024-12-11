@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NPM_CONFIG_TOKEN: ${{ secrets.NPM_TOKEN }}
-      VERSION: ${{ github.event.release.tag_name || '0.0.7' }}
+      VERSION: ${{ github.event.release.tag_name || '0.0.8' }}
     steps:
       - uses: actions/checkout@v4
       
@@ -21,18 +21,9 @@ jobs:
       - name: Install Dependencies
         run: bun install
 
-      - name: Update Template Dependencies
+      - name: Update Template Version
         run: |
-          # Update all h4-dev package versions in one go
-          sed -i 's/"@h4-dev\/[^"]*": "[^"]*"/"@h4-dev\/&": "^'$VERSION'"/g' packages/create-h4-app/templates/package.json.ts
-
-      - name: Publish create-h4-app
-        run: |
-          cat packages/create-h4-app/package.json | jq '. * {version: $VERSION} | if .dependencies then .dependencies = (.dependencies | with_entries(if .value == "workspace:*" then .value = $VERSION else . end)) else . end' --arg VERSION "$VERSION" > tmp.json
-          mv tmp.json packages/create-h4-app/package.json
-          cd packages/create-h4-app
-          bun publish --access public --auth-type legacy
-          cd ../..
+          sed -i "s/{{version}}/^$VERSION/g" packages/create-h4-app/templates/package.json.ts
 
       - name: Publish core
         run: |
@@ -79,5 +70,13 @@ jobs:
           cat packages/server/package.json | jq '. * {version: $VERSION} | if .dependencies then .dependencies = (.dependencies | with_entries(if .value == "workspace:*" then .value = $VERSION else . end)) else . end' --arg VERSION "$VERSION" > tmp.json
           mv tmp.json packages/server/package.json
           cd packages/server
+          bun publish --access public --auth-type legacy
+          cd ../..
+
+      - name: Publish create-h4-app
+        run: |
+          cat packages/create-h4-app/package.json | jq '. * {version: $VERSION} | if .dependencies then .dependencies = (.dependencies | with_entries(if .value == "workspace:*" then .value = $VERSION else . end)) else . end' --arg VERSION "$VERSION" > tmp.json
+          mv tmp.json packages/create-h4-app/package.json
+          cd packages/create-h4-app
           bun publish --access public --auth-type legacy
           cd ../..
