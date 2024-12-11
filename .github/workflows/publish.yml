@@ -2,12 +2,15 @@ name: Publish Packages
 
 on:
   workflow_dispatch:
+  release:
+    types: [created]
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     env:
       NPM_CONFIG_TOKEN: ${{ secrets.NPM_TOKEN }}
+      VERSION: ${{ '0.0.3' }}
     steps:
       - uses: actions/checkout@v4
       
@@ -20,49 +23,56 @@ jobs:
 
       - name: Publish create-h4-app
         run: |
+          cat packages/create-h4-app/package.json | jq '. * {version: env.VERSION} | .dependencies = (.dependencies | with_entries(if .value == "workspace:*" then .value = env.VERSION else . end))' --arg VERSION "$VERSION" > tmp.json
+          mv tmp.json packages/create-h4-app/package.json
           cd packages/create-h4-app
-          jq '.version = "0.0.1" | (.dependencies | if . != null then with_entries(if .value == "workspace:*" then .value = "0.0.1" else . end) else . end)' "package.json" > tmp.json && mv tmp.json "package.json"
-          bun publish --access public --auth-type legacy
+          bun publish --dry-run --auth-type legacy
           cd ../..
 
       - name: Publish core
         run: |
+          cat packages/core/package.json | jq '. * {version: env.VERSION} | .dependencies = (.dependencies | with_entries(if .value == "workspace:*" then .value = env.VERSION else . end))' --arg VERSION "$VERSION" > tmp.json
+          mv tmp.json packages/core/package.json
           cd packages/core
-          jq '.version = "0.0.1" | (.dependencies | if . != null then with_entries(if .value == "workspace:*" then .value = "0.0.1" else . end) else . end)' "package.json" > tmp.json && mv tmp.json "package.json"
-          bun publish --access public --auth-type legacy
+          bun publish --dry-run --auth-type legacy
           cd ../..
 
       - name: Publish jobs
         run: |
+          cat packages/jobs/package.json | jq '. * {version: env.VERSION} | .dependencies = (.dependencies | with_entries(if .value == "workspace:*" then .value = env.VERSION else . end))' --arg VERSION "$VERSION" > tmp.json
+          mv tmp.json packages/jobs/package.json
           cd packages/jobs
-          jq '.version = "0.0.1" | (.dependencies | if . != null then with_entries(if .value == "workspace:*" then .value = "0.0.1" else . end) else . end)' "package.json" > tmp.json && mv tmp.json "package.json"
-          bun publish --access public --auth-type legacy
+          bun publish --dry-run --auth-type legacy
           cd ../..
 
       - name: Publish queue
         run: |
+          cat packages/queue/package.json | jq '. * {version: env.VERSION} | .dependencies = (.dependencies | with_entries(if .value == "workspace:*" then .value = env.VERSION else . end))' --arg VERSION "$VERSION" > tmp.json
+          mv tmp.json packages/queue/package.json
           cd packages/queue
-          jq '.version = "0.0.1" | (.dependencies | if . != null then with_entries(if .value == "workspace:*" then .value = "0.0.1" else . end) else . end)' "package.json" > tmp.json && mv tmp.json "package.json"
-          bun publish --access public --auth-type legacy
+          bun publish --dry-run --auth-type legacy
           cd ../..
 
       - name: Publish scheduler
         run: |
+          cat packages/scheduler/package.json | jq '. * {version: env.VERSION} | .dependencies = (.dependencies | with_entries(if .value == "workspace:*" then .value = env.VERSION else . end))' --arg VERSION "$VERSION" > tmp.json
+          mv tmp.json packages/scheduler/package.json
           cd packages/scheduler
-          jq '.version = "0.0.1" | (.dependencies | if . != null then with_entries(if .value == "workspace:*" then .value = "0.0.1" else . end) else . end)' "package.json" > tmp.json && mv tmp.json "package.json"
-          bun publish --access public --auth-type legacy
+          bun publish --dry-run --auth-type legacy
           cd ../..
 
       - name: Publish models
         run: |
+          cat packages/models/package.json | jq '. * {version: env.VERSION} | .dependencies = (.dependencies | with_entries(if .value == "workspace:*" then .value = env.VERSION else . end))' --arg VERSION "$VERSION" > tmp.json
+          mv tmp.json packages/models/package.json
           cd packages/models
-          jq '.version = "0.0.1" | (.dependencies | if . != null then with_entries(if .value == "workspace:*" then .value = "0.0.1" else . end) else . end)' "package.json" > tmp.json && mv tmp.json "package.json"
-          bun publish --access public --auth-type legacy
+          bun publish --dry-run --auth-type legacy
           cd ../..
 
       - name: Publish server
         run: |
+          cat packages/server/package.json | jq '. * {version: env.VERSION} | .dependencies = (.dependencies | with_entries(if .value == "workspace:*" then .value = env.VERSION else . end))' --arg VERSION "$VERSION" > tmp.json
+          mv tmp.json packages/server/package.json
           cd packages/server
-          jq '.version = "0.0.1" | (.dependencies | if . != null then with_entries(if .value == "workspace:*" then .value = "0.0.1" else . end) else . end)' "package.json" > tmp.json && mv tmp.json "package.json"
-          bun publish --access public --auth-type legacy
+          bun publish --dry-run --auth-type legacy
           cd ../..
