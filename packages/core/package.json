@@ -1,5 +1,5 @@
 {
-	"name": "@h4/core",
+	"name": "@h4-dev/core",
 	"type": "module",
 	"exports": {
 		".": "./src/index.ts",

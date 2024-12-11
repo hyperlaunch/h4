@@ -1,13 +1,13 @@
 {
-	"name": "@h4/scheduler",
+	"name": "@h4-dev/scheduler",
 	"type": "module",
 	"exports": {
 		".": "./src/index.ts",
 		"./*": "./src/*.ts"
 	},
 	"dependencies": {
-		"@h4/core": "workspace:*",
-		"@h4/jobs": "workspace:*"
+		"@h4-dev/core": "workspace:*",
+		"@h4-dev/jobs": "workspace:*"
 	},
 	"devDependencies": {
 		"@types/bun": "latest"

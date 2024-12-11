@@ -1,5 +1,5 @@
-import log from "@h4/core/logger";
-import type { H4SchedulableJob } from "@h4/jobs/schedulable";
+import log from "@h4-dev/core/logger";
+import type { H4SchedulableJob } from "@h4-dev/jobs/schedulable";
 import type { CronSyntax } from "./cron";
 
 type ScheduledTask = {

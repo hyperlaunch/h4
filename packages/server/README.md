@@ -1,4 +1,4 @@
-# @h4/server
+# @h4-dev/server
 
 To install dependencies:
 

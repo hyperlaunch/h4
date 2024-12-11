@@ -1,4 +1,4 @@
-# @h4/scheduler
+# @h4-dev/scheduler
 
 To install dependencies:
 

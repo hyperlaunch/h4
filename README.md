@@ -20,7 +20,7 @@ Currently, we only advocate for two external tools:
 ## Quick Start
 
 ```bash
-bunx create-h4-app
+bun x create-h4-app
 ```
 
 That's it! Follow the interactive prompts to scaffold your new h4 application.

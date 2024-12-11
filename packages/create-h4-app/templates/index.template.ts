@@ -1,7 +1,7 @@
-export const indexTs = `import h4 from "@h4/core";
-import h4Queue from "@h4/queue";
-import h4Scheduler from "@h4/scheduler";
-import h4Server from "@h4/server";
+export const indexTs = `import h4 from "@h4-dev/core";
+import h4Queue from "@h4-dev/queue";
+import h4Scheduler from "@h4-dev/scheduler";
+import h4Server from "@h4-dev/server";
 
 const controllersDir = "./src/controllers";
 const port = Number(process.env.PORT || "3000");

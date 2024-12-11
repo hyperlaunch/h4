@@ -1,4 +1,4 @@
-import { queueJob } from "@h4/queue/index";
+import { queueJob } from "@h4-dev/queue/index";
 
 export type JobProps =
 	| string

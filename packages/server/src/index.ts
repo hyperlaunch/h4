@@ -1,4 +1,4 @@
-import log from "@h4/core/logger";
+import log from "@h4-dev/core/logger";
 import { FileSystemRouter, type Server, serve } from "bun";
 import type { H4BaseController, H4ControllerAction } from "./controller";
 

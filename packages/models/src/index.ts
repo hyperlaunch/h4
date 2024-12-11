@@ -1,5 +1,5 @@
 import type { Database, SQLQueryBindings } from "bun:sqlite";
-import { loadConfig } from "@h4/core/config";
+import { loadConfig } from "@h4-dev/core/config";
 
 const config = await loadConfig();
 

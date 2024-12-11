@@ -1,4 +1,4 @@
-import log from "@h4/core/logger";
+import log from "@h4-dev/core/logger";
 import { type CronSyntax, shouldRunAtTime } from "./cron";
 
 declare const self: Worker;

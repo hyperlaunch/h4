@@ -1,12 +1,12 @@
 {
-	"name": "@h4/models",
+	"name": "@h4-dev/models",
 	"type": "module",
 	"exports": {
 		".": "./src/index.ts",
 		"./*": "./src/*.ts"
 	},
 	"dependencies": {
-		"@h4/core": "workspace:*"
+		"@h4-dev/core": "workspace:*"
 	},
 	"devDependencies": {
 		"@types/bun": "latest"

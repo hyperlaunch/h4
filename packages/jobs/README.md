@@ -1,4 +1,4 @@
-# @h4/jobs
+# @h4-dev/jobs
 
 To install dependencies:
 

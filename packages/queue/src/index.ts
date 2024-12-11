@@ -1,6 +1,6 @@
-import { loadConfig } from "@h4/core/config";
-import log from "@h4/core/logger";
-import type { JobProps } from "@h4/jobs";
+import { loadConfig } from "@h4-dev/core/config";
+import log from "@h4-dev/core/logger";
+import type { JobProps } from "@h4-dev/jobs";
 import { randomUUIDv7 } from "bun";
 
 const { queueDb } = await loadConfig();

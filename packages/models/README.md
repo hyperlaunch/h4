@@ -1,4 +1,4 @@
-# @h4/models
+# @h4-dev/models
 
 To install dependencies:
 

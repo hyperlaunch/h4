@@ -1,4 +1,4 @@
-# @h4/queue
+# @h4-dev/queue
 
 To install dependencies:
 

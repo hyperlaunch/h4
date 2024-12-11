@@ -1,13 +1,13 @@
 {
-	"name": "@h4/queue",
+	"name": "@h4-dev/queue",
 	"type": "module",
 	"exports": {
 		".": "./src/index.ts",
 		"./*": "./src/*.ts"
 	},
 	"dependencies": {
-		"@h4/core": "workspace:*",
-		"@h4/jobs": "workspace:*"
+		"@h4-dev/core": "workspace:*",
+		"@h4-dev/jobs": "workspace:*"
 	},
 	"devDependencies": {
 		"@types/bun": "latest"
