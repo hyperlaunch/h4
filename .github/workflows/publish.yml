@@ -15,11 +15,9 @@ jobs:
         with:
           bun-version: latest
 
-      - name: Install Dependencies
-        run: bun install
-
       - name: Publish Packages
         run: |
+          bun install
           for pkg in packages/*; do
             if [ -f "$pkg/package.json" ]; then
               # Set version to 0.0.1
