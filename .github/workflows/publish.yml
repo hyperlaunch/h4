@@ -24,8 +24,10 @@ jobs:
         run: |
           for pkg in packages/*; do
             if [ -f "$pkg/package.json" ]; then
+              # Set version to 0.0.1
+              jq '.version = "0.0.1"' "$pkg/package.json" > tmp.json && mv tmp.json "$pkg/package.json"
               cd $pkg
-              bun publish --dry-run
+              bun publish --access public
               cd ../..
             fi
           done
