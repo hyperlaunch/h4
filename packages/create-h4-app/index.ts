@@ -73,6 +73,8 @@ console.log(`\nCreating project in ${COLOR.green(absoluteDir)}...`);
 await mkdir(absoluteDir, { recursive: true });
 await mkdir(`${absoluteDir}/src/controllers`, { recursive: true });
 await mkdir(`${absoluteDir}/storage`, { recursive: true });
+await mkdir(`${absoluteDir}/src/models`, { recursive: true });
+await mkdir(`${absoluteDir}/src/jobs`, { recursive: true });
 
 const files = {
 	"package.json": JSON.stringify(packageJson(projectName), null, 2),
@@ -81,6 +83,8 @@ const files = {
 	"index.ts": indexTs,
 	"README.md": readmeMd(projectName),
 	"src/controllers/index.ts": controllerTs,
+	"src/models/.keep": "",
+	"src/jobs/.keep": "",
 };
 
 for (const [filename, content] of Object.entries(files)) {

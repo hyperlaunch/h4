@@ -2,12 +2,12 @@ export const packageJson = (name: string) => ({
 	name,
 	type: "module",
 	dependencies: {
-		"@h4-dev/core": "^0.0.1",
-		"@h4-dev/jobs": "^0.0.1",
-		"@h4-dev/models": "^0.0.1",
-		"@h4-dev/queue": "^0.0.1",
-		"@h4-dev/scheduler": "^0.0.1",
-		"@h4-dev/server": "^0.0.1",
+		"@h4-dev/core": "{{version}}",
+		"@h4-dev/jobs": "{{version}}",
+		"@h4-dev/models": "{{version}}",
+		"@h4-dev/queue": "{{version}}",
+		"@h4-dev/scheduler": "{{version}}",
+		"@h4-dev/server": "{{version}}",
 	},
 	devDependencies: {
 		dbmate: "^2.23.0",
