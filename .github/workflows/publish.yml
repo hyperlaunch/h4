@@ -1,7 +1,6 @@
 name: Publish Packages
 
 on:
-  workflow_dispatch:
   release:
     types: [created]
 
@@ -10,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NPM_CONFIG_TOKEN: ${{ secrets.NPM_TOKEN }}
-      VERSION: ${{ github.event.release.tag_name || '0.0.9' }}
+      VERSION: ${{ github.event.release.tag_name }}
     steps:
       - uses: actions/checkout@v4
       
