@@ -26,7 +26,7 @@ jobs:
           cat packages/create-h4-app/package.json | jq '. * {version: $VERSION} | if .dependencies then .dependencies = (.dependencies | with_entries(if .value == "workspace:*" then .value = $VERSION else . end)) else . end' --arg VERSION "$VERSION" > tmp.json
           mv tmp.json packages/create-h4-app/package.json
           cd packages/create-h4-app
-          bun publish --dry-run --access public --auth-type legacy
+          bun publish --access public --access public --auth-type legacy
           cd ../..
 
       - name: Publish core
@@ -34,7 +34,7 @@ jobs:
           cat packages/core/package.json | jq '. * {version: $VERSION} | if .dependencies then .dependencies = (.dependencies | with_entries(if .value == "workspace:*" then .value = $VERSION else . end)) else . end' --arg VERSION "$VERSION" > tmp.json
           mv tmp.json packages/core/package.json
           cd packages/core
-          bun publish --dry-run --access public --auth-type legacy
+          bun publish --access public --access public --auth-type legacy
           cd ../..
 
       - name: Publish jobs
@@ -42,7 +42,7 @@ jobs:
           cat packages/jobs/package.json | jq '. * {version: $VERSION} | if .dependencies then .dependencies = (.dependencies | with_entries(if .value == "workspace:*" then .value = $VERSION else . end)) else . end' --arg VERSION "$VERSION" > tmp.json
           mv tmp.json packages/jobs/package.json
           cd packages/jobs
-          bun publish --dry-run --access public --auth-type legacy
+          bun publish --access public --access public --auth-type legacy
           cd ../..
 
       - name: Publish queue
@@ -50,7 +50,7 @@ jobs:
           cat packages/queue/package.json | jq '. * {version: $VERSION} | if .dependencies then .dependencies = (.dependencies | with_entries(if .value == "workspace:*" then .value = $VERSION else . end)) else . end' --arg VERSION "$VERSION" > tmp.json
           mv tmp.json packages/queue/package.json
           cd packages/queue
-          bun publish --dry-run --access public --auth-type legacy
+          bun publish --access public --access public --auth-type legacy
           cd ../..
 
       - name: Publish scheduler
@@ -58,7 +58,7 @@ jobs:
           cat packages/scheduler/package.json | jq '. * {version: $VERSION} | if .dependencies then .dependencies = (.dependencies | with_entries(if .value == "workspace:*" then .value = $VERSION else . end)) else . end' --arg VERSION "$VERSION" > tmp.json
           mv tmp.json packages/scheduler/package.json
           cd packages/scheduler
-          bun publish --dry-run --access public --auth-type legacy
+          bun publish --access public --access public --auth-type legacy
           cd ../..
 
       - name: Publish models
@@ -66,7 +66,7 @@ jobs:
           cat packages/models/package.json | jq '. * {version: $VERSION} | if .dependencies then .dependencies = (.dependencies | with_entries(if .value == "workspace:*" then .value = $VERSION else . end)) else . end' --arg VERSION "$VERSION" > tmp.json
           mv tmp.json packages/models/package.json
           cd packages/models
-          bun publish --dry-run --access public --auth-type legacy
+          bun publish --access public --access public --auth-type legacy
           cd ../..
 
       - name: Publish server
@@ -74,5 +74,5 @@ jobs:
           cat packages/server/package.json | jq '. * {version: $VERSION} | if .dependencies then .dependencies = (.dependencies | with_entries(if .value == "workspace:*" then .value = $VERSION else . end)) else . end' --arg VERSION "$VERSION" > tmp.json
           mv tmp.json packages/server/package.json
           cd packages/server
-          bun publish --dry-run --access public --auth-type legacy
+          bun publish --access public --access public --auth-type legacy
           cd ../..
