@@ -21,48 +21,48 @@ jobs:
       - name: Publish create-h4-app
         run: |
           cd packages/create-h4-app
-          jq '.version = "0.0.3"' "package.json" > tmp.json && mv tmp.json "package.json"
-          bun publish --dry-run --auth-type legacy
+          jq '.version = "0.0.1" | (.dependencies | if . != null then with_entries(if .value == "workspace:*" then .value = "0.0.1" else . end) else . end)' "package.json" > tmp.json && mv tmp.json "package.json"
+          bun publish --access public --auth-type legacy
           cd ../..
 
       - name: Publish core
         run: |
           cd packages/core
-          jq '.version = "0.0.3"' "package.json" > tmp.json && mv tmp.json "package.json"
-          bun publish --dry-run --auth-type legacy
+          jq '.version = "0.0.1" | (.dependencies | if . != null then with_entries(if .value == "workspace:*" then .value = "0.0.1" else . end) else . end)' "package.json" > tmp.json && mv tmp.json "package.json"
+          bun publish --access public --auth-type legacy
           cd ../..
 
       - name: Publish jobs
         run: |
           cd packages/jobs
-          jq '.version = "0.0.3"' "package.json" > tmp.json && mv tmp.json "package.json"
-          bun publish --dry-run --auth-type legacy
+          jq '.version = "0.0.1" | (.dependencies | if . != null then with_entries(if .value == "workspace:*" then .value = "0.0.1" else . end) else . end)' "package.json" > tmp.json && mv tmp.json "package.json"
+          bun publish --access public --auth-type legacy
           cd ../..
 
       - name: Publish queue
         run: |
           cd packages/queue
-          jq '.version = "0.0.3"' "package.json" > tmp.json && mv tmp.json "package.json"
-          bun publish --dry-run --auth-type legacy
+          jq '.version = "0.0.1" | (.dependencies | if . != null then with_entries(if .value == "workspace:*" then .value = "0.0.1" else . end) else . end)' "package.json" > tmp.json && mv tmp.json "package.json"
+          bun publish --access public --auth-type legacy
           cd ../..
 
       - name: Publish scheduler
         run: |
           cd packages/scheduler
-          jq '.version = "0.0.3"' "package.json" > tmp.json && mv tmp.json "package.json"
-          bun publish --dry-run --auth-type legacy
+          jq '.version = "0.0.1" | (.dependencies | if . != null then with_entries(if .value == "workspace:*" then .value = "0.0.1" else . end) else . end)' "package.json" > tmp.json && mv tmp.json "package.json"
+          bun publish --access public --auth-type legacy
           cd ../..
 
       - name: Publish models
         run: |
           cd packages/models
-          jq '.version = "0.0.3"' "package.json" > tmp.json && mv tmp.json "package.json"
-          bun publish --dry-run --auth-type legacy
+          jq '.version = "0.0.1" | (.dependencies | if . != null then with_entries(if .value == "workspace:*" then .value = "0.0.1" else . end) else . end)' "package.json" > tmp.json && mv tmp.json "package.json"
+          bun publish --access public --auth-type legacy
           cd ../..
 
       - name: Publish server
         run: |
           cd packages/server
-          jq '.version = "0.0.3"' "package.json" > tmp.json && mv tmp.json "package.json"
-          bun publish --dry-run --auth-type legacy
+          jq '.version = "0.0.1" | (.dependencies | if . != null then with_entries(if .value == "workspace:*" then .value = "0.0.1" else . end) else . end)' "package.json" > tmp.json && mv tmp.json "package.json"
+          bun publish --access public --auth-type legacy
           cd ../..
