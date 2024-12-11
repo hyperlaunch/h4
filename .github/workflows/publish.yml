@@ -15,14 +15,54 @@ jobs:
         with:
           bun-version: latest
 
-      - name: Publish Packages
+      - name: Install Dependencies
+        run: bun install
+
+      - name: Publish create-h4-app
         run: |
-          bun install
-          for pkg in packages/*; do
-            if [ -f "$pkg/package.json" ]; then
-              jq '.version = "0.0.2"' "$pkg/package.json" > tmp.json && mv tmp.json "$pkg/package.json"
-              cd $pkg
-              bun publish --access public --auth-type legacy
-              cd ../..
-            fi
-          done
+          cd packages/create-h4-app
+          jq '.version = "0.0.3"' "package.json" > tmp.json && mv tmp.json "package.json"
+          bun publish --dry-run --auth-type legacy
+          cd ../..
+
+      - name: Publish core
+        run: |
+          cd packages/core
+          jq '.version = "0.0.3"' "package.json" > tmp.json && mv tmp.json "package.json"
+          bun publish --dry-run --auth-type legacy
+          cd ../..
+
+      - name: Publish jobs
+        run: |
+          cd packages/jobs
+          jq '.version = "0.0.3"' "package.json" > tmp.json && mv tmp.json "package.json"
+          bun publish --dry-run --auth-type legacy
+          cd ../..
+
+      - name: Publish queue
+        run: |
+          cd packages/queue
+          jq '.version = "0.0.3"' "package.json" > tmp.json && mv tmp.json "package.json"
+          bun publish --dry-run --auth-type legacy
+          cd ../..
+
+      - name: Publish scheduler
+        run: |
+          cd packages/scheduler
+          jq '.version = "0.0.3"' "package.json" > tmp.json && mv tmp.json "package.json"
+          bun publish --dry-run --auth-type legacy
+          cd ../..
+
+      - name: Publish models
+        run: |
+          cd packages/models
+          jq '.version = "0.0.3"' "package.json" > tmp.json && mv tmp.json "package.json"
+          bun publish --dry-run --auth-type legacy
+          cd ../..
+
+      - name: Publish server
+        run: |
+          cd packages/server
+          jq '.version = "0.0.3"' "package.json" > tmp.json && mv tmp.json "package.json"
+          bun publish --dry-run --auth-type legacy
+          cd ../..
