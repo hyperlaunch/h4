@@ -20,8 +20,7 @@ jobs:
           bun install
           for pkg in packages/*; do
             if [ -f "$pkg/package.json" ]; then
-              # Set version to 0.0.1
-              jq '.version = "0.0.1"' "$pkg/package.json" > tmp.json && mv tmp.json "$pkg/package.json"
+              jq '.version = "0.0.2"' "$pkg/package.json" > tmp.json && mv tmp.json "$pkg/package.json"
               cd $pkg
               bun publish --access public --auth-type legacy
               cd ../..
