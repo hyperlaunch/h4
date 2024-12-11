@@ -1,6 +1,8 @@
 {
 	"name": "create-h4-app",
-	"module": "index.ts",
+	"bin": {
+		"create-h4-app": "./index.ts"
+	},
 	"type": "module",
 	"devDependencies": {
 		"@types/bun": "latest"
