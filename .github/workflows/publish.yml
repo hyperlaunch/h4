@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NPM_CONFIG_TOKEN: ${{ secrets.NPM_TOKEN }}
-      VERSION: ${{ github.event.release.tag_name || '0.0.6' }}
+      VERSION: ${{ github.event.release.tag_name || '0.0.7' }}
     steps:
       - uses: actions/checkout@v4
       
@@ -23,11 +23,8 @@ jobs:
 
       - name: Update Template Dependencies
         run: |
-          # Create a backup of the original file
-          cp packages/create-h4-app/templates/package.json.ts packages/create-h4-app/templates/package.json.ts.bak
-          
-          # Update all h4-dev dependencies in one pass
-          perl -pi -e 's/"@h4-dev\/([^"]+)": "\^[0-9]+\.[0-9]+\.[0-9]+"/"@h4-dev\/$1": "^'$VERSION'"/g' packages/create-h4-app/templates/package.json.ts
+          # Update all h4-dev package versions in one go
+          sed -i 's/"@h4-dev\/[^"]*": "[^"]*"/"@h4-dev\/&": "^'$VERSION'"/g' packages/create-h4-app/templates/package.json.ts
 
       - name: Publish create-h4-app
         run: |
