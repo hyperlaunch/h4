@@ -6,11 +6,8 @@ export type H4Config = {
 };
 
 export async function loadConfig({
-	fileName = "h4.config.ts",
-	dir = import.meta.env.H4_ROOT,
+	configPath = `${import.meta.env.H4_ROOT}/h4.config.ts`,
 } = {}) {
-	const configPath = new URL(fileName, `file://${dir}`).href;
-
 	const { config }: { config: H4Config } = await import(configPath);
 	return config;
 }
