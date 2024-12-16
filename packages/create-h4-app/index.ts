@@ -3,10 +3,13 @@ import { mkdir } from "node:fs/promises";
 import { Glob } from "bun";
 import { biomeJson } from "./templates/biome.json";
 import { controllerTs } from "./templates/controller";
+import genesis from "./templates/genesis.sql.txt" with { type: "text" };
+import gitignore from "./templates/gitignore.txt" with { type: "text" };
 import { h4Config } from "./templates/h4.config";
 import { indexTs } from "./templates/index.template";
 import { packageJson } from "./templates/package.json";
 import { readmeMd } from "./templates/readme.md";
+import tsconfig from "./templates/tsconfig.json.txt" with { type: "text" };
 
 async function prompt(query: string): Promise<string> {
 	process.stdout.write(query);
@@ -94,11 +97,9 @@ const files = {
 	"src/controllers/index.ts": controllerTs,
 	"src/models/.keep": "",
 	"src/jobs/.keep": "",
-	".gitignore": await Bun.file("./templates/gitignore.txt").text(),
-	"tsconfig.json": await Bun.file("./templates/tsconfig.json.txt").text(),
-	[`db/migrations/${getCurrentTimestamp()}_genesis.sql`]: await Bun.file(
-		"./templates/genesis.sql.txt",
-	).text(),
+	".gitignore": gitignore,
+	"tsconfig.json": tsconfig,
+	[`db/migrations/${getCurrentTimestamp()}_genesis.sql`]: genesis,
 };
 
 for (const [filename, content] of Object.entries(files))
