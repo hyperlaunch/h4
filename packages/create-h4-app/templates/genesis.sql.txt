@@ -1,4 +1,4 @@
--- migrate:up
+-- migrate:up transaction:false
 -- Ensure integrity and durability
 PRAGMA journal_mode = WAL; -- Enables Write-Ahead Logging for better concurrency
 PRAGMA synchronous = NORMAL; -- Balances durability and performance

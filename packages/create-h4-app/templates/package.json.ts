@@ -10,7 +10,7 @@ export const packageJson = (name: string) => ({
 		"@h4-dev/server": "{{version}}",
 	},
 	devDependencies: {
-		dbmate: "^2.23.0",
+		dbmate: "^2.24.0",
 		"@biomejs/biome": "^1.9.4",
 		"@types/bun": "latest",
 		typescript: "^5.0.0",
