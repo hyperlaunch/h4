@@ -1,0 +1,19 @@
+-- migrate:up
+-- Ensure integrity and durability
+PRAGMA journal_mode = WAL; -- Enables Write-Ahead Logging for better concurrency
+PRAGMA synchronous = NORMAL; -- Balances durability and performance
+PRAGMA temp_store = MEMORY; -- Stores temp tables and indexes in memory
+
+-- Performance optimisations
+PRAGMA cache_size = -20000; -- Sets ~20 MB of cache (-X is in KB, so 20000 = 20 MB)
+PRAGMA mmap_size = 268435456; -- Enables memory-mapped I/O (256 MB example)
+PRAGMA page_size = 4096; -- Standard page size (aligns with disk sectors)
+PRAGMA locking_mode = EXCLUSIVE; -- Prevents file-locking issues in single-writer scenarios
+PRAGMA foreign_keys = ON; -- Enforces foreign key constraints
+
+-- Optional safety checks (only run during maintenance windows)
+PRAGMA integrity_check; -- Verifies database consistency
+PRAGMA optimize; -- Analyses and improves indexes
+
+-- migrate:down
+

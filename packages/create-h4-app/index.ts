@@ -43,6 +43,14 @@ function formatProjectName(name: string): string {
 		.replace(/^-|-$/g, "");
 }
 
+function getCurrentTimestamp(): string {
+	const now = new Date();
+	return now
+		.toISOString()
+		.replace(/[-:TZ]/g, "")
+		.slice(0, 14); // YYYYMMDDHHMMSS
+}
+
 console.log(COLOR.cyan("\nWelcome to create-h4-app v0.0.1\n"));
 
 const defaultDir = "./";
@@ -75,6 +83,7 @@ await mkdir(`${absoluteDir}/src/controllers`, { recursive: true });
 await mkdir(`${absoluteDir}/storage`, { recursive: true });
 await mkdir(`${absoluteDir}/src/models`, { recursive: true });
 await mkdir(`${absoluteDir}/src/jobs`, { recursive: true });
+await mkdir(`${absoluteDir}/db/migrations`, { recursive: true });
 
 const files = {
 	"package.json": JSON.stringify(packageJson(projectName), null, 2),
@@ -87,11 +96,13 @@ const files = {
 	"src/jobs/.keep": "",
 	".gitignore": await Bun.file("./templates/gitignore.txt").text(),
 	"tsconfig.json": await Bun.file("./templates/tsconfig.json.txt").text(),
+	[`db/migrations/${getCurrentTimestamp()}_genesis.sql`]: await Bun.file(
+		"./templates/genesis.sql.txt",
+	).text(),
 };
 
-for (const [filename, content] of Object.entries(files)) {
+for (const [filename, content] of Object.entries(files))
 	await Bun.write(`${absoluteDir}/${filename}`, content);
-}
 
 console.log("\nInstalling dependencies...");
 const bunInstall = Bun.spawn(["bun", "install"], {
