@@ -10,7 +10,7 @@ export default class ${name} extends H4BaseModel {
 }
 	
 export const ${name}Repository = new H4Repository({
-	table: ${tableName},
+	table: "${tableName}",
 	model: ${name},
 	${fields.includes("id!:") ? "useUuid: true," : ""}
 });`;
