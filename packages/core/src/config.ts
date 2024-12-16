@@ -7,7 +7,7 @@ export type H4Config = {
 
 export async function loadConfig({
 	fileName = "h4.config.ts",
-	dir = new URL(".", `file://${Bun.main}`).pathname,
+	dir = import.meta.env.H4_ROOT,
 } = {}) {
 	const configPath = new URL(fileName, `file://${dir}`).href;
 

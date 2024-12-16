@@ -54,7 +54,7 @@ function getCurrentTimestamp(): string {
 		.slice(0, 14); // YYYYMMDDHHMMSS
 }
 
-console.log(COLOR.cyan("\nWelcome to create-h4-app v0.0.1\n"));
+console.log(COLOR.cyan("\nWelcome to create-h4-app\n"));
 
 const defaultDir = "./";
 const projectDir =
@@ -100,6 +100,7 @@ const files = {
 	".gitignore": gitignore,
 	"tsconfig.json": JSON.stringify(tsconfigJson, null, 2),
 	[`db/migrations/${getCurrentTimestamp()}_genesis.sql`]: genesis,
+	".env.local": `h4_ROOT=${absoluteDir}`,
 };
 
 for (const [filename, content] of Object.entries(files))
