@@ -11,12 +11,6 @@ export async function loadConfig({
 } = {}) {
 	const configPath = new URL(fileName, `file://${dir}`).href;
 
-	try {
-		const { config }: { config: H4Config } = await import(configPath);
-		return config;
-	} catch (error) {
-		throw new Error(
-			`Failed to load config from ${configPath}: ${error.message}`,
-		);
-	}
+	const { config }: { config: H4Config } = await import(configPath);
+	return config;
 }

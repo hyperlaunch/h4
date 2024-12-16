@@ -1,6 +1,9 @@
 {
 	"name": "@h4-dev/core",
 	"type": "module",
+	"bin": {
+		"h4": "./cli/index.ts"
+	},
 	"exports": {
 		".": "./src/index.ts",
 		"./*": "./src/*.ts"

@@ -9,7 +9,7 @@ import { h4Config } from "./templates/h4.config";
 import { indexTs } from "./templates/index.template";
 import { packageJson } from "./templates/package.json";
 import { readmeMd } from "./templates/readme.md";
-import tsconfig from "./templates/tsconfig.json.txt" with { type: "text" };
+import { tsconfigJson } from "./templates/tsconfig.json";
 
 async function prompt(query: string): Promise<string> {
 	process.stdout.write(query);
@@ -98,7 +98,7 @@ const files = {
 	"src/models/.keep": "",
 	"src/jobs/.keep": "",
 	".gitignore": gitignore,
-	"tsconfig.json": tsconfig,
+	"tsconfig.json": JSON.stringify(tsconfigJson, null, 2),
 	[`db/migrations/${getCurrentTimestamp()}_genesis.sql`]: genesis,
 };
 
