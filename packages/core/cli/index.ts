@@ -23,7 +23,7 @@ const BASE_PATHS = {
 	controller: "src/controllers",
 	model: "src/models",
 	job: "src/jobs",
-	migrate: "db/migrate",
+	migrate: "db/migrations",
 };
 
 const TYPE_MAPPING_SQLITE: Record<string, string> = {

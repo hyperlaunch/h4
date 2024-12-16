@@ -20,6 +20,5 @@ export const packageJson = (name: string) => ({
 		build: "bun build --compile ./index.ts --outfile release",
 		dbmate: "DATABASE_URL='sqlite:storage/primary.db' dbmate",
 		fmt: "bun run biome check --write ./src",
-		h4: "bun run h4",
 	},
 });
