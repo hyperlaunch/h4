@@ -1,5 +1,7 @@
 /// <reference lib="webworker" />
 
+import log from "@h4-dev/core/logger";
+
 self.onmessage = async (event: MessageEvent) => {
 	const { id, filepath, props } = event.data;
 
@@ -19,10 +21,11 @@ self.onmessage = async (event: MessageEvent) => {
 			`${jobInstance.constructor.name} does not have a run method`,
 		);
 	} catch (error) {
-		postMessage({
-			status: "error",
-			id,
-			error: (error as { message: string }).message,
+		log({
+			type: "ERROR",
+			message: `Job ${event.data.id} updated with status: failed, error`,
+			color: "red",
 		});
+		console.error(error);
 	}
 };

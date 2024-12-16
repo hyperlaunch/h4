@@ -62,10 +62,12 @@ async function checkSchedule() {
 				});
 			}
 		} catch (error) {
-			postMessage({
-				status: "error",
-				error: (error as { message: string }).message,
+			log({
+				type: "ERROR",
+				message: `Scheduled job ${task.filepath} failed with error`,
+				color: "red",
 			});
+			console.error(error);
 		}
 	}
 }

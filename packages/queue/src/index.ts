@@ -17,17 +17,11 @@ worker.onmessage = (event) => {
 				message: `Job ${event.data.id} updated with status: completed`,
 				color: "green",
 			})
-		: event.data.status === "error"
-			? log({
-					type: "ERROR",
-					message: `Job ${event.data.id} updated with status: failed, error: ${JSON.stringify(event.data.error)}`,
-					color: "red",
-				})
-			: log({
-					type: "INFO",
-					message: `Worker execution: ${JSON.stringify(event.data)}`,
-					color: "cyan",
-				});
+		: log({
+				type: "INFO",
+				message: `Worker execution: ${JSON.stringify(event.data)}`,
+				color: "cyan",
+			});
 
 	isWorkerBusy = false;
 

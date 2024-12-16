@@ -68,6 +68,7 @@ export default function h4Server({
 							message: `Error loading controller: ${filePath}. ${JSON.stringify(err)}`,
 							color: "red",
 						});
+						console.error(err);
 						logRequest(req, 500);
 						return new Response("Internal Server Error", { status: 500 });
 					}
