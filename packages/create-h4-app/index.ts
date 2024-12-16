@@ -85,6 +85,8 @@ const files = {
 	"src/controllers/index.ts": controllerTs,
 	"src/models/.keep": "",
 	"src/jobs/.keep": "",
+	".gitignore": await Bun.file("./templates/gitignore.txt").text(),
+	"tsconfig.json": await Bun.file("./templates/tsconfig.json.txt").text(),
 };
 
 for (const [filename, content] of Object.entries(files)) {
