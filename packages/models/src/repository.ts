@@ -6,8 +6,6 @@ import { QueryBuilder } from "./query";
 
 const config = await loadConfig();
 
-type Errors = Record<string, string>;
-
 type H4RepositoryOptions<T> = {
 	table: string;
 	model: new () => T;
@@ -23,6 +21,8 @@ export class H4Repository<
 	private readonly db: Database;
 	private readonly useUuid: UseUuid;
 
+	private errors: Partial<Record<keyof T | "base", string>> = {};
+
 	constructor({
 		table,
 		model,
@@ -37,6 +37,8 @@ export class H4Repository<
 
 	create(params: UseUuid extends true ? Omit<T, "id"> & { id?: string } : T) {
 		try {
+			this.errors = {};
+
 			const fullParams =
 				this.useUuid && !("id" in params && params.id)
 					? { ...params, id: randomUUIDv7() }
@@ -52,12 +54,11 @@ export class H4Repository<
 			const values: SQLQueryBindings[] = Object.values(fullParams);
 
 			const result = stmt.as(this.model).get(...values);
-
 			return { result, errors: undefined };
 		} catch (error) {
-			const errors = this.translateSqliteError(error as SQLiteError);
+			this.translateSqliteError(error as SQLiteError);
 			console.error(error);
-			return { errors, result: undefined };
+			return { errors: this.errors, result: undefined };
 		}
 	}
 
@@ -65,67 +66,65 @@ export class H4Repository<
 		return new QueryBuilder<T>(this.table, this.db, this.model);
 	}
 
-	private translateSqliteError(error: SQLiteError): Errors {
-		const errors: Errors = {};
-
+	private translateSqliteError(error: SQLiteError) {
 		if (error?.code) {
 			switch (error.code) {
 				case "SQLITE_CONSTRAINT_UNIQUE":
-					this.handleUniqueConstraintError(error.message, errors);
+					this.handleUniqueConstraintError(error.message);
 					break;
 				case "SQLITE_CONSTRAINT_NOTNULL":
-					this.handleNotNullConstraintError(error.message, errors);
+					this.handleNotNullConstraintError(error.message);
 					break;
 				case "SQLITE_CONSTRAINT_CHECK":
-					this.handleCheckConstraintError(error.message, errors);
+					this.handleCheckConstraintError(error.message);
 					break;
 				default:
-					errors._base = "A database constraint was violated.";
+					this.errors.base = "A database constraint was violated.";
 			}
 		} else {
-			errors._base = "Unexpected error.";
+			this.errors.base = "Unexpected error.";
 		}
-
-		return errors;
 	}
 
-	private handleUniqueConstraintError(message: string, errors: Errors) {
+	private handleUniqueConstraintError(message: string) {
 		const match = message.match(/UNIQUE constraint failed: ([\w.]+)/);
 		if (match) {
-			const field = match[1].split(".").pop() || "field";
-			errors[field] = `${this.humanize(field)} must be unique.`;
+			const field = match[1].split(".").pop() as keyof T;
+			this.errors[field] = `${this.humanize(field)} must be unique.`;
 		} else {
-			errors._base = "A unique constraint was violated.";
+			this.errors.base = "A unique constraint was violated.";
 		}
 	}
 
-	private handleNotNullConstraintError(message: string, errors: Errors) {
+	private handleNotNullConstraintError(message: string) {
 		const match = message.match(/NOT NULL constraint failed: ([\w.]+)/);
 		if (match) {
-			const field = match[1].split(".").pop() || "field";
-			errors[field] = `${this.humanize(field)} is required.`;
+			const field = match[1].split(".").pop() as keyof T;
+			this.errors[field] = `${this.humanize(field)} is required.`;
 		} else {
-			errors._base = "A required field is missing.";
+			this.errors.base = "A required field is missing.";
 		}
 	}
 
-	private handleCheckConstraintError(message: string, errors: Errors) {
+	private handleCheckConstraintError(message: string) {
 		const match = message.match(/CHECK constraint failed: ([\w\s\W]+)/);
 		if (match) {
 			const condition = match[1];
 			const fieldMatch = condition.match(/([\w]+)\s*(>=|<=|>|<|=|!=)/);
 			if (fieldMatch) {
-				const field = fieldMatch[1];
-				errors[field] = `${this.humanize(field)} is invalid.`;
+				const field = fieldMatch[1] as keyof T;
+				this.errors[field] = `${this.humanize(field)} is invalid.`;
 			} else {
-				errors._base = `A condition failed: ${condition}.`;
+				this.errors.base = `A condition failed: ${condition}.`;
 			}
 		} else {
-			errors._base = "A check constraint was violated.";
+			this.errors.base = "A check constraint was violated.";
 		}
 	}
 
-	private humanize(field: string): string {
-		return field.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+	private humanize(field: keyof T) {
+		return String(field)
+			.replace(/_/g, " ")
+			.replace(/\b\w/g, (c) => c.toUpperCase());
 	}
 }
