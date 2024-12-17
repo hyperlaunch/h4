@@ -76,18 +76,56 @@ async function createController(path: string) {
 }
 
 async function createModel(name: string, fields: string[]) {
-	// Parse fields into TypeScript and SQLite column types
-	const parsedFieldsTS = fields.map(parseField(TYPE_MAPPING_TS));
-	const parsedFieldsSQL = fields.map(parseField(TYPE_MAPPING_SQLITE));
+	// Extract and handle fields with optional primary key
+	const parsedFieldsSQL = fields.map((field) => {
+		const parts = field.split(":");
+		if (parts.length < 2) {
+			console.error(
+				COLOR.red(
+					`Error: Invalid field definition "${field}". Use name:type[:pk]`,
+				),
+			);
+			process.exit(1);
+		}
 
-	// Add non-null assertion (!) for TypeScript fields
-	const tsFields = parsedFieldsTS
-		.map(([fieldName, fieldType]) => `${fieldName}!: ${fieldType};`)
-		.join("\n\t");
+		const fieldName = parts[0];
+		const fieldType = parts[1];
+		const isPrimaryKey = parts[2] === "pk";
+		const sqlType = TYPE_MAPPING_SQLITE[fieldType];
 
-	const sqlFields = parsedFieldsSQL
-		.map(([fieldName, sqlType]) => `  ${fieldName} ${sqlType}`)
-		.join(",\n");
+		if (!sqlType) {
+			console.error(COLOR.red(`Error: Unsupported type "${fieldType}"`));
+			process.exit(1);
+		}
+
+		return isPrimaryKey
+			? `  ${fieldName} ${sqlType} PRIMARY KEY`
+			: `  ${fieldName} ${sqlType}`;
+	});
+
+	// Parse TypeScript fields
+	const parsedFieldsTS = fields.map((field) => {
+		const parts = field.split(":");
+		if (parts.length < 2) {
+			console.error(
+				COLOR.red(
+					`Error: Invalid field definition "${field}". Use name:type[:pk]`,
+				),
+			);
+			process.exit(1);
+		}
+		const fieldName = parts[0];
+		const fieldType = TYPE_MAPPING_TS[parts[1]];
+
+		if (!fieldType) {
+			console.error(COLOR.red(`Error: Unsupported type "${parts[1]}"`));
+			process.exit(1);
+		}
+
+		return `${fieldName}!: ${fieldType};`;
+	});
+
+	const tsFields = parsedFieldsTS.join("\n\t");
 
 	// Model file
 	const modelFilePath = resolve(
@@ -109,12 +147,12 @@ async function createModel(name: string, fields: string[]) {
 	);
 	const migrationContent = `-- migrate:up transaction:false
 CREATE TABLE ${formatToTableName(name)} (
-${sqlFields}
+${parsedFieldsSQL.join(",\n")}
 );
 
 -- migrate:down
-DROP TABLE ${formatToTableName(name)};
-`;
+DROP TABLE ${formatToTableName(name)};`;
+
 	await createFile(migrationFilePath, migrationContent);
 }
 
