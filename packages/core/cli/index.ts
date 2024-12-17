@@ -108,7 +108,7 @@ async function createModel(name: string, fields: string[]) {
 			process.exit(1);
 		}
 
-		let constraints = [];
+		const constraints = [];
 		if (isPrimaryKey) constraints.push("PRIMARY KEY");
 		if (isUnique) constraints.push("UNIQUE");
 
