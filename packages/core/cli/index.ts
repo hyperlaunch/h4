@@ -76,13 +76,13 @@ async function createController(path: string) {
 }
 
 async function createModel(name: string, fields: string[]) {
-	// Extract and handle fields with optional primary key
+	// Extract and handle fields with optional primary key and unique constraints
 	const parsedFieldsSQL = fields.map((field) => {
 		const parts = field.split(":");
 		if (parts.length < 2) {
 			console.error(
 				COLOR.red(
-					`Error: Invalid field definition "${field}". Use name:type[:pk]`,
+					`Error: Invalid field definition "${field}". Use name:type[:pk][:unique]`,
 				),
 			);
 			process.exit(1);
@@ -90,7 +90,8 @@ async function createModel(name: string, fields: string[]) {
 
 		const fieldName = parts[0];
 		const fieldType = parts[1];
-		const isPrimaryKey = parts[2] === "pk";
+		const isPrimaryKey = parts.includes("pk");
+		const isUnique = parts.includes("unique");
 		const sqlType = TYPE_MAPPING_SQLITE[fieldType];
 
 		if (!sqlType) {
@@ -98,9 +99,20 @@ async function createModel(name: string, fields: string[]) {
 			process.exit(1);
 		}
 
-		return isPrimaryKey
-			? `  ${fieldName} ${sqlType} PRIMARY KEY`
-			: `  ${fieldName} ${sqlType}`;
+		if (isPrimaryKey && isUnique) {
+			console.error(
+				COLOR.red(
+					`Error: Field "${fieldName}" cannot be both PRIMARY KEY and UNIQUE.`,
+				),
+			);
+			process.exit(1);
+		}
+
+		let constraints = [];
+		if (isPrimaryKey) constraints.push("PRIMARY KEY");
+		if (isUnique) constraints.push("UNIQUE");
+
+		return `  ${fieldName} ${sqlType} ${constraints.join(" ").trim()}`.trim();
 	});
 
 	// Parse TypeScript fields
@@ -109,7 +121,7 @@ async function createModel(name: string, fields: string[]) {
 		if (parts.length < 2) {
 			console.error(
 				COLOR.red(
-					`Error: Invalid field definition "${field}". Use name:type[:pk]`,
+					`Error: Invalid field definition "${field}". Use name:type[:pk][:unique]`,
 				),
 			);
 			process.exit(1);
@@ -160,18 +172,6 @@ async function createJob(name: string) {
 	const jobFilePath = resolve(BASE_PATHS.job, `${formatToFileName(name)}.ts`);
 	const jobContent = jobTs(formatToClassName(name));
 	await createFile(jobFilePath, jobContent);
-}
-
-function parseField(mapping: Record<string, string>) {
-	return (field: string): [string, string] => {
-		const [name, type] = field.split(":");
-		const mappedType = mapping[type];
-		if (!mappedType) {
-			console.error(COLOR.red(`Error: Unsupported type "${type}"`));
-			process.exit(1);
-		}
-		return [name, mappedType];
-	};
 }
 
 function formatToClassName(input: string): string {
