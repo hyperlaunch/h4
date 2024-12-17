@@ -65,16 +65,22 @@ export class H4Repository<
 		return new QueryBuilder<T>(this.table, this.db, this.model);
 	}
 
-	private translateSqliteError(error: SQLiteError) {
+	private translateSqliteError(error: SQLiteError): Errors {
 		const errors: Errors = {};
 
 		if (error?.code) {
 			switch (error.code) {
-				case "SQLITE_CONSTRAINT":
-					this.handleConstraintError(error.message, errors);
+				case "SQLITE_CONSTRAINT_UNIQUE":
+					this.handleUniqueConstraintError(error.message, errors);
+					break;
+				case "SQLITE_CONSTRAINT_NOTNULL":
+					this.handleNotNullConstraintError(error.message, errors);
+					break;
+				case "SQLITE_CONSTRAINT_CHECK":
+					this.handleCheckConstraintError(error.message, errors);
 					break;
 				default:
-					errors._base = "An unknown database error occurred.";
+					errors._base = "A database constraint was violated.";
 			}
 		} else {
 			errors._base = "Unexpected error.";
@@ -83,24 +89,30 @@ export class H4Repository<
 		return errors;
 	}
 
-	private handleConstraintError(message: string, errors: Errors) {
-		const uniqueMatch = message.match(/UNIQUE constraint failed: ([\w.]+)/);
-		if (uniqueMatch) {
-			const field = uniqueMatch[1].split(".").pop() || "field";
+	private handleUniqueConstraintError(message: string, errors: Errors) {
+		const match = message.match(/UNIQUE constraint failed: ([\w.]+)/);
+		if (match) {
+			const field = match[1].split(".").pop() || "field";
 			errors[field] = `${this.humanize(field)} must be unique.`;
-			return;
+		} else {
+			errors._base = "A unique constraint was violated.";
 		}
+	}
 
-		const notNullMatch = message.match(/NOT NULL constraint failed: ([\w.]+)/);
-		if (notNullMatch) {
-			const field = notNullMatch[1].split(".").pop() || "field";
+	private handleNotNullConstraintError(message: string, errors: Errors) {
+		const match = message.match(/NOT NULL constraint failed: ([\w.]+)/);
+		if (match) {
+			const field = match[1].split(".").pop() || "field";
 			errors[field] = `${this.humanize(field)} is required.`;
-			return;
+		} else {
+			errors._base = "A required field is missing.";
 		}
+	}
 
-		const checkMatch = message.match(/CHECK constraint failed: ([\w\s\W]+)/);
-		if (checkMatch) {
-			const condition = checkMatch[1];
+	private handleCheckConstraintError(message: string, errors: Errors) {
+		const match = message.match(/CHECK constraint failed: ([\w\s\W]+)/);
+		if (match) {
+			const condition = match[1];
 			const fieldMatch = condition.match(/([\w]+)\s*(>=|<=|>|<|=|!=)/);
 			if (fieldMatch) {
 				const field = fieldMatch[1];
@@ -108,10 +120,9 @@ export class H4Repository<
 			} else {
 				errors._base = `A condition failed: ${condition}.`;
 			}
-			return;
+		} else {
+			errors._base = "A check constraint was violated.";
 		}
-
-		errors._base = "A database constraint was violated.";
 	}
 
 	private humanize(field: string): string {
