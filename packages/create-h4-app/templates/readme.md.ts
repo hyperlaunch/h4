@@ -25,7 +25,7 @@ Your app will be available at [http://localhost:3000](http://localhost:3000).
 To create your first model (and corresponding db migration):
 
 \`\`\`bash
-bun run h4 create model User id:string:pk email:string:unique name:string
+bun run h4 create model User id:string:pk email:string:unique name:string address:string:nullable
 \`\`\`
 
 To create your first controller:

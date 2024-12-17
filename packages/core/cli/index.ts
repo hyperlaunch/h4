@@ -81,7 +81,7 @@ async function createModel(name: string, fields: string[]) {
 		if (parts.length < 2) {
 			console.error(
 				COLOR.red(
-					`Error: Invalid field definition "${field}". Use name:type[:pk][:unique]`,
+					`Error: Invalid field definition "${field}". Use name:type[:pk][:unique][:nullable]`,
 				),
 			);
 			process.exit(1);
@@ -91,6 +91,7 @@ async function createModel(name: string, fields: string[]) {
 		const fieldType = parts[1];
 		const isPrimaryKey = parts.includes("pk");
 		const isUnique = parts.includes("unique");
+		const isNullable = parts.includes("nullable");
 		const sqlType = TYPE_MAPPING_SQLITE[fieldType];
 
 		if (!sqlType) {
@@ -110,6 +111,7 @@ async function createModel(name: string, fields: string[]) {
 		const constraints = [];
 		if (isPrimaryKey) constraints.push("PRIMARY KEY");
 		if (isUnique) constraints.push("UNIQUE");
+		if (!isNullable && !isPrimaryKey) constraints.push("NOT NULL");
 
 		return `  ${fieldName} ${sqlType} ${constraints.join(" ").trim()}`.trim();
 	});
@@ -119,20 +121,23 @@ async function createModel(name: string, fields: string[]) {
 		if (parts.length < 2) {
 			console.error(
 				COLOR.red(
-					`Error: Invalid field definition "${field}". Use name:type[:pk][:unique]`,
+					`Error: Invalid field definition "${field}". Use name:type[:pk][:unique][:nullable]`,
 				),
 			);
 			process.exit(1);
 		}
 		const fieldName = parts[0];
 		const fieldType = TYPE_MAPPING_TS[parts[1]];
+		const isNullable = parts.includes("nullable");
 
 		if (!fieldType) {
 			console.error(COLOR.red(`Error: Unsupported type "${parts[1]}"`));
 			process.exit(1);
 		}
 
-		return `${fieldName}!: ${fieldType};`;
+		return isNullable
+			? `${fieldName}?: ${fieldType};`
+			: `${fieldName}!: ${fieldType};`;
 	});
 
 	const tsFields = parsedFieldsTS.join("\n\t");
