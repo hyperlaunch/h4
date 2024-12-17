@@ -76,7 +76,6 @@ async function createController(path: string) {
 }
 
 async function createModel(name: string, fields: string[]) {
-	// Extract and handle fields with optional primary key and unique constraints
 	const parsedFieldsSQL = fields.map((field) => {
 		const parts = field.split(":");
 		if (parts.length < 2) {
@@ -115,7 +114,6 @@ async function createModel(name: string, fields: string[]) {
 		return `  ${fieldName} ${sqlType} ${constraints.join(" ").trim()}`.trim();
 	});
 
-	// Parse TypeScript fields
 	const parsedFieldsTS = fields.map((field) => {
 		const parts = field.split(":");
 		if (parts.length < 2) {
@@ -139,7 +137,6 @@ async function createModel(name: string, fields: string[]) {
 
 	const tsFields = parsedFieldsTS.join("\n\t");
 
-	// Model file
 	const modelFilePath = resolve(
 		BASE_PATHS.model,
 		`${formatToFileName(name)}.ts`,
@@ -151,13 +148,12 @@ async function createModel(name: string, fields: string[]) {
 	);
 	await createFile(modelFilePath, modelContent);
 
-	// Migration file
 	const timestamp = getCurrentTimestamp();
 	const migrationFilePath = resolve(
 		BASE_PATHS.migrate,
 		`${timestamp}_create_${formatToFileName(name)}.sql`,
 	);
-	const migrationContent = `-- migrate:up transaction:false
+	const migrationContent = `-- migrate:up
 CREATE TABLE ${formatToTableName(name)} (
 ${parsedFieldsSQL.join(",\n")}
 );
