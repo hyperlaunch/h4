@@ -100,7 +100,8 @@ const files = {
 	".gitignore": gitignore,
 	"tsconfig.json": JSON.stringify(tsconfigJson, null, 2),
 	[`db/migrations/${getCurrentTimestamp()}_genesis.sql`]: genesis,
-	".env.local": `H4_ROOT=${absoluteDir}`,
+	"worker.queue.ts": 'export * from "@h4-dev/queue/worker";',
+	"worker.scheduler.ts": 'export * from "@h4-dev/scheduler/worker";',
 };
 
 for (const [filename, content] of Object.entries(files))

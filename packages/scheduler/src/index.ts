@@ -7,7 +7,7 @@ type ScheduledTask = {
 	job: new () => H4SchedulableJob;
 };
 
-const workerUrl = new URL("worker.ts", import.meta.url);
+const workerUrl = Bun.resolveSync("./worker.scheduler.ts", process.cwd());
 const worker = new Worker(workerUrl);
 
 worker.onmessage = (event) => {

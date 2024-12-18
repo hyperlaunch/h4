@@ -5,7 +5,7 @@ import { randomUUIDv7 } from "bun";
 
 const { queueDb } = await loadConfig();
 
-const workerUrl = new URL("worker.ts", import.meta.url);
+const workerUrl = Bun.resolveSync("./worker.queue.ts", process.cwd());
 const worker = new Worker(workerUrl);
 
 let isWorkerBusy = false;

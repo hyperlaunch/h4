@@ -6,7 +6,7 @@ export type H4Config = {
 };
 
 export async function loadConfig({
-	configPath = `${import.meta.env.H4_ROOT}/h4.config.ts`,
+	configPath = Bun.resolveSync("./h4.config.ts", process.cwd()),
 } = {}) {
 	const { config }: { config: H4Config } = await import(configPath);
 	return config;
