@@ -31,7 +31,7 @@ const COLOR = {
 async function isDirectoryEmpty(path: string) {
 	try {
 		const entries = Array.from(
-			new Bun.Glob(`${path}/*`).scanSync({ onlyFiles: false }),
+			new Glob(`${path}/*`).scanSync({ onlyFiles: false }),
 		);
 
 		return entries.length === 0;

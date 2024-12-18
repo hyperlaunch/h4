@@ -81,7 +81,7 @@ async function createModel(name: string, fields: string[]) {
 		if (parts.length < 2) {
 			console.error(
 				COLOR.red(
-					`Error: Invalid field definition "${field}". Use name:type[:pk][:unique][:nullable]`,
+					`Error: Invalid field definition "${field}". Use name:type[:pk][:unique][:optional]`,
 				),
 			);
 			process.exit(1);
@@ -91,7 +91,7 @@ async function createModel(name: string, fields: string[]) {
 		const fieldType = parts[1];
 		const isPrimaryKey = parts.includes("pk");
 		const isUnique = parts.includes("unique");
-		const isNullable = parts.includes("nullable");
+		const isoptional = parts.includes("optional");
 		const sqlType = TYPE_MAPPING_SQLITE[fieldType];
 
 		if (!sqlType) {
@@ -111,7 +111,7 @@ async function createModel(name: string, fields: string[]) {
 		const constraints = [];
 		if (isPrimaryKey) constraints.push("PRIMARY KEY");
 		if (isUnique) constraints.push("UNIQUE");
-		if (!isNullable && !isPrimaryKey) constraints.push("NOT NULL");
+		if (!isoptional && !isPrimaryKey) constraints.push("NOT NULL");
 
 		return `  ${fieldName} ${sqlType} ${constraints.join(" ").trim()}`.trim();
 	});
@@ -121,21 +121,21 @@ async function createModel(name: string, fields: string[]) {
 		if (parts.length < 2) {
 			console.error(
 				COLOR.red(
-					`Error: Invalid field definition "${field}". Use name:type[:pk][:unique][:nullable]`,
+					`Error: Invalid field definition "${field}". Use name:type[:pk][:unique][:optional]`,
 				),
 			);
 			process.exit(1);
 		}
 		const fieldName = parts[0];
 		const fieldType = TYPE_MAPPING_TS[parts[1]];
-		const isNullable = parts.includes("nullable");
+		const isoptional = parts.includes("optional");
 
 		if (!fieldType) {
 			console.error(COLOR.red(`Error: Unsupported type "${parts[1]}"`));
 			process.exit(1);
 		}
 
-		return isNullable
+		return isoptional
 			? `${fieldName}?: ${fieldType};`
 			: `${fieldName}!: ${fieldType};`;
 	});
@@ -169,9 +169,45 @@ DROP TABLE ${formatToTableName(name)};`;
 	await createFile(migrationFilePath, migrationContent);
 }
 
-async function createJob(name: string) {
+async function createJob(name: string, fields: string[]) {
+	const ALLOWED_TYPES = ["string", "number", "boolean"];
+
+	const parsedFieldsTS = fields.map((field) => {
+		const parts = field.split(":");
+		if (parts.length < 2) {
+			console.error(
+				COLOR.red(
+					`Error: Invalid field definition "${field}". Use name:type[:optional]`,
+				),
+			);
+			process.exit(1);
+		}
+
+		const fieldName = parts[0];
+		const fieldType = parts[1];
+		const isOptional = parts.includes("optional");
+
+		if (!ALLOWED_TYPES.includes(fieldType)) {
+			console.error(
+				COLOR.red(
+					`Error: Unsupported type "${fieldType}". Allowed types: ${ALLOWED_TYPES.join(", ")}`,
+				),
+			);
+			process.exit(1);
+		}
+
+		return isOptional
+			? `${fieldName}?: ${fieldType};`
+			: `${fieldName}: ${fieldType};`;
+	});
+
+	const propsType =
+		parsedFieldsTS.length > 0
+			? `{\n\t${parsedFieldsTS.join("\n\t")}\n}`
+			: undefined;
+
 	const jobFilePath = resolve(BASE_PATHS.job, `${formatToFileName(name)}.ts`);
-	const jobContent = jobTs(formatToClassName(name));
+	const jobContent = jobTs(formatToClassName(name), propsType);
 	await createFile(jobFilePath, jobContent);
 }
 
@@ -229,7 +265,12 @@ if (command === "create") {
 			createModel(name, fields);
 			break;
 		case "job":
-			createJob(name);
+			if (!name) {
+				console.error(COLOR.red("Error: Missing job name"));
+				console.log(USAGE);
+				process.exit(1);
+			}
+			createJob(name, fields);
 			break;
 		default:
 			console.error(COLOR.red(`Error: Unknown type "${type}"`));
