@@ -5,7 +5,7 @@ export default function h4Frontend({
 	frontendDir = `${process.cwd()}/src/frontend`,
 	distDir = `${process.cwd()}/public/h4-dist`,
 	entrypoints = ["./entry.ts", "./entry.css"],
-	isProd = process.env.NODE_ENV !== "production",
+	isProd = process.env.NODE_ENV === "production",
 }: {
 	frontendDir?: string;
 	distDir?: string;
@@ -13,6 +13,7 @@ export default function h4Frontend({
 	isProd?: boolean;
 }) {
 	return async () => {
+		buildFrontend({ frontendDir, distDir, entrypoints, isProd });
 		const watcher = watch(frontendDir, () =>
 			buildFrontend({ frontendDir, distDir, entrypoints, isProd }),
 		);
