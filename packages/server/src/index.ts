@@ -27,14 +27,15 @@ export default function h4Server({
 			dir: controllersDir,
 		});
 
-		const publicDir = Bun.resolveSync("./public", process.cwd());
+		const publicDir = `${process.cwd()}/public`;
 
 		serve({
 			port,
 			fetch: async (req, server) => {
-				const staticFileName = new URL(req.url).pathname;
-
-				const staticFilePath = new URL(staticFileName, publicDir);
+				const staticFileName = new URL(req.url).pathname.replace(/^\//, "");
+				const staticFilePath = Bun.pathToFileURL(
+					`${publicDir}/${staticFileName}`,
+				);
 				const staticFile = Bun.file(staticFilePath);
 
 				if (await staticFile.exists()) {
