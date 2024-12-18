@@ -13,7 +13,7 @@ export function assetUrl(
 	const targetExtension =
 		extname(assetName) === ".ts" ? ".js" : extname(assetName);
 
-	const pattern = `${assetBaseName}-*${targetExtension}`;
+	const pattern = `${assetBaseName}*${targetExtension}`;
 	const glob = new Glob(pattern);
 
 	try {
@@ -22,7 +22,8 @@ export function assetUrl(
 		if (matches.length > 0) {
 			const matchedFile = matches[0];
 			const relativePath = matchedFile.replace(distDir, "").replace(/\\/g, "/");
-			return `/h4-dist${relativePath}`;
+			// TODO: Don't hardcode /h4-dist/
+			return `/h4-dist/${relativePath}`;
 		}
 
 		throw new Error(`Asset not found: ${assetName}`);
