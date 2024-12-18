@@ -86,6 +86,7 @@ await mkdir(`${absoluteDir}/src/controllers`, { recursive: true });
 await mkdir(`${absoluteDir}/storage`, { recursive: true });
 await mkdir(`${absoluteDir}/src/models`, { recursive: true });
 await mkdir(`${absoluteDir}/src/jobs`, { recursive: true });
+await mkdir(`${absoluteDir}/public`, { recursive: true });
 await mkdir(`${absoluteDir}/db/migrations`, { recursive: true });
 
 const files = {
@@ -97,6 +98,7 @@ const files = {
 	"src/controllers/index.ts": controllerTs,
 	"src/models/.keep": "",
 	"src/jobs/.keep": "",
+	"public/.keep": "",
 	".gitignore": gitignore,
 	"tsconfig.json": JSON.stringify(tsconfigJson, null, 2),
 	[`db/migrations/${getCurrentTimestamp()}_genesis.sql`]: genesis,
