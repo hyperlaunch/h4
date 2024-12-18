@@ -27,9 +27,21 @@ export default function h4Server({
 			dir: controllersDir,
 		});
 
+		const publicDir = Bun.resolveSync("./public", process.cwd());
+
 		serve({
 			port,
 			fetch: async (req, server) => {
+				const staticFileName = new URL(req.url).pathname;
+
+				const staticFilePath = new URL(staticFileName, publicDir);
+				const staticFile = Bun.file(staticFilePath);
+
+				if (await staticFile.exists()) {
+					logRequest(req, 200);
+					return new Response(staticFile);
+				}
+
 				if (middleware) await middleware({ req, server });
 
 				const match = router.match(req);
