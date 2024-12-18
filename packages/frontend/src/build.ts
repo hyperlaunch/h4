@@ -1,3 +1,4 @@
+import { rm } from "node:fs/promises";
 import log from "@h4-dev/core/logger";
 import { build } from "bun";
 
@@ -12,6 +13,8 @@ export default async function buildFrontend({
 	entrypoints: string[];
 	isProd: boolean;
 }) {
+	await rm(frontendDir, { recursive: true, force: true });
+
 	const buildOptions = {
 		entrypoints: entrypoints.map((entry) => `${frontendDir}/${entry}`),
 		outdir: distDir,

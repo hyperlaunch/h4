@@ -14,9 +14,9 @@ export default function h4Frontend({
 }) {
 	return async () => {
 		buildFrontend({ frontendDir, distDir, entrypoints, isProd });
-		const watcher = watch(frontendDir, () =>
-			buildFrontend({ frontendDir, distDir, entrypoints, isProd }),
-		);
+		const watcher = watch(frontendDir, async () => {
+			buildFrontend({ frontendDir, distDir, entrypoints, isProd });
+		});
 
 		process.on("SIGINT", () => {
 			watcher.close();
