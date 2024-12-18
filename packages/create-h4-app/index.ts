@@ -55,7 +55,7 @@ function getCurrentTimestamp() {
 	return now
 		.toISOString()
 		.replace(/[-:TZ]/g, "")
-		.slice(0, 14); // YYYYMMDDHHMMSS
+		.slice(0, 14);
 }
 
 console.log(COLOR.cyan("\nWelcome to create-h4-app\n"));

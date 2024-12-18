@@ -54,6 +54,7 @@ node_modules/
 npm-debug.log_
 out
 pids
+public/h4-dist
 report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 web_modules/
 yarn-debug.log*
