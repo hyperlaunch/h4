@@ -13,7 +13,7 @@ export default async function buildFrontend({
 	entrypoints: string[];
 	isProd: boolean;
 }) {
-	await rm(frontendDir, { recursive: true, force: true });
+	await rm(distDir, { recursive: true, force: true });
 
 	const buildOptions = {
 		entrypoints: entrypoints.map((entry) => `${frontendDir}/${entry}`),

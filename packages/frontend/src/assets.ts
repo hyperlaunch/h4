@@ -1,13 +1,14 @@
 import { basename, extname, join } from "node:path";
 import { Glob } from "bun";
 
-export function assetUrl({
-	distDir,
-	assetName,
-}: {
-	distDir: string;
-	assetName: string;
-}): string {
+export function assetUrl(
+	assetName: string,
+	{
+		distDir = `${process.cwd()}/public/h4-dist`,
+	}: {
+		distDir?: string;
+	} = {},
+): string {
 	const assetBaseName = basename(assetName, extname(assetName));
 	const targetExtension =
 		extname(assetName) === ".ts" ? ".js" : extname(assetName);
