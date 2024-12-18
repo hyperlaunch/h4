@@ -32,7 +32,7 @@ export default async function buildFrontend({
 		const result = await build({
 			...buildOptions,
 			sourcemap: "linked",
-			naming: "[name]-[hash].[ext]",
+			naming: "[dir]/[name]-[hash].[ext]",
 		});
 
 		if (result.success) {
@@ -59,7 +59,7 @@ export default async function buildFrontend({
 		const result = await build({
 			...buildOptions,
 			sourcemap: "inline",
-			naming: "[name].[ext]",
+			naming: "[dir]/[name].[ext]",
 		});
 
 		if (result.success) {
