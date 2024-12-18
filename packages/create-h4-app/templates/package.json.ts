@@ -1,4 +1,4 @@
-export const packageJson = (name: string) => ({
+export const packageJson = (name: string, apiOnly = false) => ({
 	name,
 	type: "module",
 	dependencies: {
@@ -8,6 +8,7 @@ export const packageJson = (name: string) => ({
 		"@h4-dev/queue": "{{version}}",
 		"@h4-dev/scheduler": "{{version}}",
 		"@h4-dev/server": "{{version}}",
+		...(apiOnly ? {} : { "@h4-dev/frontend": "{{version}}" }),
 	},
 	devDependencies: {
 		dbmate: "^2.24.0",

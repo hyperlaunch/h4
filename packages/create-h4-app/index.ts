@@ -7,6 +7,8 @@ import genesis from "./templates/genesis.sql.txt" with { type: "text" };
 import gitignore from "./templates/gitignore.txt" with { type: "text" };
 import { h4Config } from "./templates/h4.config";
 import { indexTs } from "./templates/index.template";
+import mainCss from "./templates/main.css.txt" with { type: "text" };
+import { mainTs } from "./templates/main.template";
 import { packageJson } from "./templates/package.json";
 import { readmeMd } from "./templates/readme.md";
 import { tsconfigJson } from "./templates/tsconfig.json";
@@ -73,6 +75,13 @@ const projectName =
 		`What is your project named? ${COLOR.blue(`(${defaultName})`)} `,
 	)) || defaultName;
 
+const defaultApiOnlyAnswer = "N";
+const apiOnlyAnswer =
+	(await prompt(
+		`Is this an API only project? ${COLOR.blue(`(${defaultApiOnlyAnswer})`)} `,
+	)) || defaultApiOnlyAnswer;
+const apiOnly = apiOnlyAnswer === "Y";
+
 if (!(await isDirectoryEmpty(absoluteDir))) {
 	console.error(
 		COLOR.red(
@@ -88,18 +97,22 @@ await mkdir(`${absoluteDir}/src/controllers`, { recursive: true });
 await mkdir(`${absoluteDir}/storage`, { recursive: true });
 await mkdir(`${absoluteDir}/src/models`, { recursive: true });
 await mkdir(`${absoluteDir}/src/jobs`, { recursive: true });
+!apiOnly && (await mkdir(`${absoluteDir}/src/frontend`, { recursive: true }));
 await mkdir(`${absoluteDir}/public`, { recursive: true });
 await mkdir(`${absoluteDir}/db/migrations`, { recursive: true });
 
 const files = {
-	"package.json": JSON.stringify(packageJson(projectName), null, 2),
+	"package.json": JSON.stringify(packageJson(projectName, apiOnly), null, 2),
 	"biome.json": JSON.stringify(biomeJson, null, 2),
 	"h4.config.ts": h4Config,
-	"index.ts": indexTs,
+	"index.ts": indexTs(apiOnly),
 	"README.md": readmeMd(projectName),
 	"src/controllers/index.ts": controllerTs,
 	"src/models/.keep": "",
 	"src/jobs/.keep": "",
+	...(apiOnly
+		? {}
+		: { "src/frontend/main.ts": mainTs, "src/frontend/main.css": mainCss }),
 	"public/.keep": "",
 	".gitignore": gitignore,
 	"tsconfig.json": JSON.stringify(tsconfigJson, null, 2),

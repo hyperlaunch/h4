@@ -72,6 +72,14 @@ jobs:
           bun publish --access public --auth-type legacy
           cd ../..
 
+      - name: Publish frontend
+        run: |
+          cat packages/frontend/package.json | jq '. * {version: $VERSION} | if .dependencies then .dependencies = (.dependencies | with_entries(if .value == "workspace:*" then .value = $VERSION else . end)) else . end' --arg VERSION "$VERSION" > tmp.json
+          mv tmp.json packages/frontend/package.json
+          cd packages/frontend
+          bun publish --access public --auth-type legacy
+          cd ../..
+
       - name: Publish create-h4-app
         run: |
           cat packages/create-h4-app/package.json | jq '. * {version: $VERSION} | if .dependencies then .dependencies = (.dependencies | with_entries(if .value == "workspace:*" then .value = $VERSION else . end)) else . end' --arg VERSION "$VERSION" > tmp.json
