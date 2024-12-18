@@ -133,7 +133,7 @@ export class QueryBuilder<T> {
 			.get(...this.values);
 	}
 
-	exists(): boolean {
+	exists() {
 		const sql = `SELECT 1 FROM ${this.table}
             ${this.joinClauses.length ? this.joinClauses.join(" ") : ""}
             ${

@@ -175,18 +175,18 @@ async function createJob(name: string) {
 	await createFile(jobFilePath, jobContent);
 }
 
-function formatToClassName(input: string): string {
+function formatToClassName(input: string) {
 	return input
 		.replace(/[-_]+/g, " ")
 		.replace(/(?:^|\s)\w/g, (match) => match.toUpperCase())
 		.replace(/\s+/g, "");
 }
 
-function formatToFileName(input: string): string {
+function formatToFileName(input: string) {
 	return input.replace(/[-_]+/g, "-").toLowerCase();
 }
 
-function formatToTableName(input: string): string {
+function formatToTableName(input: string) {
 	return input.replace(/[-_]+/g, "_").toLowerCase();
 }
 
@@ -194,7 +194,7 @@ function basename(path: string) {
 	return String(path.split("/").pop());
 }
 
-function getCurrentTimestamp(): string {
+function getCurrentTimestamp() {
 	const now = new Date();
 	const year = now.getFullYear();
 	const month = String(now.getMonth() + 1).padStart(2, "0");

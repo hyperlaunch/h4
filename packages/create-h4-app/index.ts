@@ -11,7 +11,7 @@ import { packageJson } from "./templates/package.json";
 import { readmeMd } from "./templates/readme.md";
 import { tsconfigJson } from "./templates/tsconfig.json";
 
-async function prompt(query: string): Promise<string> {
+async function prompt(query: string) {
 	process.stdout.write(query);
 	const response = await new Promise<string>((resolve) => {
 		process.stdin.once("data", (data) => {
@@ -28,17 +28,19 @@ const COLOR = {
 	cyan: (str: string) => `\x1b[36m${str}\x1b[0m`,
 };
 
-async function isDirectoryEmpty(path: string): Promise<boolean> {
+async function isDirectoryEmpty(path: string) {
 	try {
-		const glob = new Glob("**/*");
-		const entries = glob.scanSync(path);
-		return !entries.next().done;
+		const entries = Array.from(
+			new Bun.Glob(`${path}/*`).scanSync({ onlyFiles: false }),
+		);
+
+		return entries.length === 0;
 	} catch {
 		return true;
 	}
 }
 
-function formatProjectName(name: string): string {
+function formatProjectName(name: string) {
 	return name
 		.toLowerCase()
 		.replace(/[^a-z0-9-]/g, "-")
@@ -46,7 +48,7 @@ function formatProjectName(name: string): string {
 		.replace(/^-|-$/g, "");
 }
 
-function getCurrentTimestamp(): string {
+function getCurrentTimestamp() {
 	const now = new Date();
 	return now
 		.toISOString()

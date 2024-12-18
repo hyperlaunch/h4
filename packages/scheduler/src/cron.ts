@@ -37,7 +37,7 @@ type WeekdayField =
 export type CronSyntax =
 	`${MinuteField} ${HourField} ${DayField} ${MonthField} ${WeekdayField}`;
 
-export function shouldRunAtTime(expr: CronSyntax, date: Date): boolean {
+export function shouldRunAtTime(expr: CronSyntax, date: Date) {
 	const fields = expr.split(" ");
 	const timeFields = [
 		date.getMinutes(),
@@ -50,7 +50,7 @@ export function shouldRunAtTime(expr: CronSyntax, date: Date): boolean {
 	return fields.every((field, idx) => matchesField(field, timeFields[idx]));
 }
 
-function matchesField(field: string, value: number): boolean {
+function matchesField(field: string, value: number) {
 	if (field === "*") return true;
 
 	if (field.includes("/")) {
