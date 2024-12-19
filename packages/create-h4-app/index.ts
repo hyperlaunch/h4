@@ -7,6 +7,7 @@ import genesis from "./templates/genesis.sql.txt" with { type: "text" };
 import gitignore from "./templates/gitignore.txt" with { type: "text" };
 import { h4Config } from "./templates/h4.config";
 import { indexTs } from "./templates/index.template";
+import { layoutTs } from "./templates/layout.template";
 import mainCss from "./templates/main.css.txt" with { type: "text" };
 import { mainTs } from "./templates/main.template";
 import { packageJson } from "./templates/package.json";
@@ -185,7 +186,12 @@ const files = {
 		: { "worker.scheduler.ts": 'export * from "@h4-dev/scheduler/worker";' }),
 	...(args.skipViews
 		? {}
-		: { "src/views/index.tsx": viewTs, "src/views/components/.keep": "" }),
+		: {
+				"src/views/index.tsx": viewTs,
+				"src/views/components/base-layout.tsx": layoutTs({
+					skipFrontend: args.skipFrontend,
+				}),
+			}),
 };
 
 for (const [filename, content] of Object.entries(files)) {
