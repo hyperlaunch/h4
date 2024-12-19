@@ -51,7 +51,10 @@ export abstract class H4BaseController {
 		};
 	}
 
-	compile(instance: { compile: () => string }, { status = 200 } = {}) {
-		return this.html(instance.compile(), { status });
+	async compile(
+		instance: { compile: () => string | Promise<string> },
+		{ status = 200 } = {},
+	) {
+		return this.html(await instance.compile(), { status });
 	}
 }
