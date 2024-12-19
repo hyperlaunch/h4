@@ -1,13 +1,13 @@
-import { renderToStream } from "@kitajs/html/suspense";
+import { contentToString } from "@kitajs/html";
 
 export abstract class H4BaseView<T = undefined> {
 	props: T;
 
 	abstract render: () => JSX.Element;
 
-	constructor({ props }: { props: T }) {
-		this.props = props;
+	constructor(args: { props: T }) {
+		this.props = args?.props;
 	}
 
-	compile = () => renderToStream(this.render());
+	compile = () => contentToString(this.render());
 }
