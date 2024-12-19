@@ -61,6 +61,12 @@ A fast bundler and using `Bun.build`:
 - Transpiles TypeScript, JavaScript, and CSS
 - Integrated live reload for development
 
+### views
+A lightweight templating system:
+- Component-based design using JSX
+- Server-side rendering with streaming support
+- Type-safe props for predictable templates
+
 ### Supporting Utilities
 - Logging
 - Configuration management
