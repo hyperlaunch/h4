@@ -170,7 +170,13 @@ const files = {
 	...(!args.skipFrontend
 		? { "src/frontend/main.ts": mainTs, "src/frontend/main.css": mainCss }
 		: {}),
-	"public/.keep": "",
+	...(args.skipFrontend
+		? {}
+		: {
+				"public/favicon.ico": Bun.file(
+					new URL("templates/favicon.ico", import.meta.url).pathname,
+				),
+			}),
 	".gitignore": gitignore,
 	"tsconfig.json": JSON.stringify(
 		tsconfigJson({ skipViews: args.skipViews }),

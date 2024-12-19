@@ -1,4 +1,52 @@
-body {
+body,
+html {
+	margin: 0;
+	padding: 0;
+	height: 100%;
 	font-family: "SF Mono", "Monaco", "Inconsolata", "Fira Mono",
 		"Droid Sans Mono", "Source Code Pro", monospace;
+	background-color: #000000;
+	color: #ffffff;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+.container {
+	text-align: center;
+	max-width: 700px;
+	padding: 20px;
+}
+.logo {
+	width: 80px;
+	height: 80px;
+	background-color: #a3e635;
+	color: #000000;
+	font-size: 2rem;
+	font-weight: bold;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin: 0 auto 2rem;
+	border-radius: 4px;
+}
+.description {
+	font-size: 0.9rem;
+	margin-bottom: 2rem;
+	color: #cccccc;
+	line-height: 1.6;
+}
+.cli-info {
+	background-color: #111111;
+	padding: 20px;
+	text-align: left;
+	overflow-x: auto;
+	border-radius: 4px;
+}
+.cli-info p {
+	margin: 0 0 10px 0;
+	color: #ffffff;
+}
+.cli-command {
+	color: #ffffff;
+	font-weight: bold;
 }

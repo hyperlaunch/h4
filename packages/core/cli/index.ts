@@ -14,6 +14,7 @@ Usage:
   h4 create model <model-name> [field:type ...]
   h4 create job <job-name> [prop:type ...]
   h4 create view <view-name> [prop:type ...]
+  h4 create component <component-name> [prop:type ...]
 `;
 
 const COLOR = {
