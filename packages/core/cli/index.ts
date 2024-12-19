@@ -5,12 +5,14 @@ import { write } from "bun";
 import { controllerTs } from "./templates/controller";
 import { jobTs } from "./templates/job";
 import { modelTs } from "./templates/model";
+import { viewTs } from "./templates/view"; // Assuming a template for views
 
 const USAGE = `
 Usage:
   h4 create controller <path/to/controller>
   h4 create model <model-name> [field:type ...]
   h4 create job <job-name> [prop:type ...]
+  h4 create view <view-name> [prop:type ...]
 `;
 
 const COLOR = {
@@ -23,6 +25,7 @@ const BASE_PATHS = {
 	controller: "src/controllers",
 	model: "src/models",
 	job: "src/jobs",
+	view: "src/views",
 	migrate: "db/migrations",
 };
 
@@ -203,12 +206,47 @@ async function createJob(name: string, fields: string[]) {
 
 	const propsType =
 		parsedFieldsTS.length > 0
-			? `{\n\t${parsedFieldsTS.join("\n\t")}\n}`
+			? `{
+		${parsedFieldsTS.join("\n\t")}
+	}`
 			: undefined;
 
 	const jobFilePath = resolve(BASE_PATHS.job, `${formatToFileName(name)}.ts`);
 	const jobContent = jobTs(formatToClassName(name), propsType);
 	await createFile(jobFilePath, jobContent);
+}
+
+async function createView(name: string, fields: string[]) {
+	const parsedFieldsTS = fields.map((field) => {
+		const parts = field.split(":");
+		if (parts.length < 2) {
+			console.error(
+				COLOR.red(
+					`Error: Invalid field definition "${field}". Use name:type[:optional]`,
+				),
+			);
+			process.exit(1);
+		}
+
+		const fieldName = parts[0];
+		const fieldType = parts[1];
+		const isOptional = parts.includes("optional");
+
+		return isOptional
+			? `${fieldName}?: ${fieldType};`
+			: `${fieldName}: ${fieldType};`;
+	});
+
+	const propsType =
+		parsedFieldsTS.length > 0
+			? `{
+		${parsedFieldsTS.join("\n\t")}
+	}`
+			: undefined;
+
+	const viewFilePath = resolve(BASE_PATHS.view, `${formatToFileName(name)}.ts`);
+	const viewContent = viewTs(formatToClassName(name), propsType);
+	await createFile(viewFilePath, viewContent);
 }
 
 function formatToClassName(input: string) {
@@ -265,12 +303,10 @@ if (command === "create") {
 			createModel(name, fields);
 			break;
 		case "job":
-			if (!name) {
-				console.error(COLOR.red("Error: Missing job name"));
-				console.log(USAGE);
-				process.exit(1);
-			}
 			createJob(name, fields);
+			break;
+		case "view":
+			createView(name, fields);
 			break;
 		default:
 			console.error(COLOR.red(`Error: Unknown type "${type}"`));
