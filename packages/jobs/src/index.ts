@@ -6,14 +6,16 @@ export type JobProps =
 	| boolean
 	| null
 	| { [key: string]: JobProps }
-	| JobProps[];
+	| JobProps[]
+	| undefined;
 
-export abstract class H4BaseJob<T extends JobProps = JobProps> {
+export abstract class H4BaseJob<T extends JobProps = undefined> {
 	abstract filepath: string;
 	props: T;
 
-	constructor({ props }: { props: T }) {
-		this.props = props;
+	// biome-ignore lint/suspicious/noConfusingVoidType: <explanation>
+	constructor(props: T extends undefined ? void : T) {
+		this.props = (props as T) ?? (undefined as T);
 	}
 
 	queue() {

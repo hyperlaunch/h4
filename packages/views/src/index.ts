@@ -5,10 +5,9 @@ export abstract class H4BaseView<T = undefined> {
 
 	abstract render: () => JSX.Element;
 
-	constructor(
-		args?: T extends undefined ? { props?: undefined } : { props: T },
-	) {
-		this.props = (args?.props as T) ?? (undefined as T);
+	// biome-ignore lint/suspicious/noConfusingVoidType: <explanation>
+	constructor(props: T extends undefined ? void : T) {
+		this.props = props as T;
 	}
 
 	compile = () => contentToString(this.render());
