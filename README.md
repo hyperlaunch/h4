@@ -27,7 +27,7 @@ That's it! Follow the interactive prompts to scaffold your new h4 application.
 
 ## Core Packages
 
-h4 is organized as a monorepo containing several powerful packages:
+h4 is organized as a monorepo containing several packages:
 
 ### server
 A high-performance HTTP server featuring:
@@ -54,6 +54,12 @@ A job scheduler similar to cron:
 - `Worker` based execution
 - Recurring job support
 - Simple cron syntax for scheduling
+- 
+### frontend
+A fast bundler and using `Bun.build`:
+- Cache-busting filenames for efficient caching
+- Transpiles TypeScript, JavaScript, and CSS
+- Integrated live reload for development
 
 ### Supporting Utilities
 - Logging
