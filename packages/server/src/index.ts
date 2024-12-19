@@ -66,11 +66,35 @@ export default function h4Server({
 							| "delete";
 
 						if (typeof controllerInstance[method] === "function") {
-							const handler = controllerInstance[method] as H4ControllerAction;
+							const handler: H4ControllerAction = controllerInstance[method];
 
-							const response = await handler();
-							logRequest(req, response.status);
-							return response;
+							const result = await handler();
+
+							if (result instanceof Response) {
+								logRequest(req, result.status);
+								return result;
+							}
+
+							switch (result.type) {
+								case "json":
+									logRequest(req, result.status);
+									return Response.json(result.data, { status: result.status });
+								case "redirect":
+									logRequest(req, result.status);
+									return Response.redirect(
+										String(result.location),
+										result.status,
+									);
+								case "html":
+									logRequest(req, result.status);
+									return new Response(result.html, {
+										status: result.status,
+										headers: { "Content-Type": "text/html; charset=utf-8" },
+									});
+								default:
+									logRequest(req, 500);
+									return new Response("Invalid response type", { status: 500 });
+							}
 						}
 
 						logRequest(req, 405);

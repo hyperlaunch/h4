@@ -1,10 +1,16 @@
-export const tsconfigJson = {
+export const tsconfigJson = ({ skipViews }: { skipViews: boolean }) => ({
 	compilerOptions: {
 		lib: ["ESNext", "DOM"],
 		target: "ESNext",
 		module: "ESNext",
 		moduleDetection: "force",
-		jsx: "react-jsx",
+		...(skipViews
+			? {}
+			: {
+					jsx: "react-jsx",
+					jsxImportSource: "@kitajs/html",
+					plugins: [{ name: "@kitajs/ts-html-plugin" }],
+				}),
 		allowJs: true,
 		moduleResolution: "bundler",
 		allowImportingTsExtensions: true,
@@ -17,4 +23,4 @@ export const tsconfigJson = {
 		noUnusedParameters: false,
 		noPropertyAccessFromIndexSignature: false,
 	},
-};
+});

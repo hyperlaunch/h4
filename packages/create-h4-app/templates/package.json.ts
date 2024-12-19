@@ -1,10 +1,12 @@
 export const packageJson = ({
 	skipFrontend,
+	skipViews,
 	skipQueue,
 	skipScheduler,
 	name,
 }: {
 	skipFrontend: boolean;
+	skipViews: boolean;
 	skipQueue: boolean;
 	skipScheduler: boolean;
 	name: string;
@@ -19,6 +21,13 @@ export const packageJson = ({
 		...(skipScheduler ? {} : { "@h4-dev/scheduler": "{{version}}" }),
 		...(skipQueue && skipScheduler ? {} : { "@h4-dev/jobs": "{{version}}" }),
 		...(skipFrontend ? {} : { "@h4-dev/frontend": "{{version}}" }),
+		...(skipViews
+			? {}
+			: {
+					"@h4-dev/views": "{{version}}",
+					"@kitajs/html": "^4.2.6",
+					"@kitajs/ts-html-plugin": "^4.1.1",
+				}),
 	},
 	devDependencies: {
 		dbmate: "^2.24.0",

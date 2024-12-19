@@ -1,8 +1,8 @@
 #!/usr/bin/env bun
 import { mkdir } from "node:fs/promises";
 import { Glob } from "bun";
+import { apiControllerTs } from "./templates/api-controller.template";
 import { biomeJson } from "./templates/biome.json";
-import { controllerTs } from "./templates/controller";
 import genesis from "./templates/genesis.sql.txt" with { type: "text" };
 import gitignore from "./templates/gitignore.txt" with { type: "text" };
 import { h4Config } from "./templates/h4.config";
@@ -12,6 +12,8 @@ import { mainTs } from "./templates/main.template";
 import { packageJson } from "./templates/package.json";
 import { readmeMd } from "./templates/readme.md";
 import { tsconfigJson } from "./templates/tsconfig.json";
+import { viewControllerTs } from "./templates/view-controller.template";
+import { viewTs } from "./templates/view.template";
 
 const USAGE = `
 Usage:
@@ -21,6 +23,7 @@ Options:
   --skip-frontend      Exclude frontend files and directories.
   --skip-queue         Exclude queue worker setup.
   --skip-scheduler     Exclude scheduler worker setup.
+  --skip-views         Exclude view files and directories.
   --name=<name>        Set the project name explicitly.
   --help               Show this help message.
 `;
@@ -64,12 +67,14 @@ function parseArgs(args: string[]) {
 		skipFrontend: boolean;
 		skipQueue: boolean;
 		skipScheduler: boolean;
+		skipViews: boolean;
 		name?: string;
 		path?: string;
 	} = {
 		skipFrontend: false,
 		skipQueue: false,
 		skipScheduler: false,
+		skipViews: false,
 	};
 
 	for (let i = 0; i < args.length; i++) {
@@ -79,6 +84,7 @@ function parseArgs(args: string[]) {
 			if (arg === "--skip-frontend") options.skipFrontend = true;
 			else if (arg === "--skip-queue") options.skipQueue = true;
 			else if (arg === "--skip-scheduler") options.skipScheduler = true;
+			else if (arg === "--skip-views") options.skipViews = true;
 			else if (arg.startsWith("--name=")) options.name = arg.split("=")[1];
 			else if (arg === "--help") {
 				console.log(USAGE);
@@ -128,6 +134,8 @@ await mkdir(`${absoluteDir}/src/models`, { recursive: true });
 	(await mkdir(`${absoluteDir}/src/jobs`, { recursive: true }));
 if (!args.skipFrontend)
 	await mkdir(`${absoluteDir}/src/frontend`, { recursive: true });
+if (!args.skipViews)
+	await mkdir(`${absoluteDir}/src/views`, { recursive: true });
 await mkdir(`${absoluteDir}/public`, { recursive: true });
 await mkdir(`${absoluteDir}/db/migrations`, { recursive: true });
 
@@ -138,6 +146,7 @@ const files = {
 			skipFrontend: args.skipFrontend,
 			skipQueue: args.skipQueue,
 			skipScheduler: args.skipScheduler,
+			skipViews: args.skipViews,
 		}),
 		null,
 		2,
@@ -152,15 +161,22 @@ const files = {
 		skipScheduler: args.skipScheduler,
 	}),
 	"README.md": readmeMd(projectName),
-	"src/controllers/index.ts": controllerTs,
+	"src/controllers/index.ts": args.skipViews
+		? apiControllerTs
+		: viewControllerTs,
 	"src/models/.keep": "",
 	...(args.skipQueue && args.skipScheduler ? {} : { "src/jobs/.keep": "" }),
 	...(!args.skipFrontend
 		? { "src/frontend/main.ts": mainTs, "src/frontend/main.css": mainCss }
 		: {}),
+	...(args.skipViews ? {} : { "src/views/.keep": "" }),
 	"public/.keep": "",
 	".gitignore": gitignore,
-	"tsconfig.json": JSON.stringify(tsconfigJson, null, 2),
+	"tsconfig.json": JSON.stringify(
+		tsconfigJson({ skipViews: args.skipViews }),
+		null,
+		2,
+	),
 	[`db/migrations/${getCurrentTimestamp()}_genesis.sql`]: genesis,
 	...(args.skipQueue
 		? {}
@@ -168,6 +184,7 @@ const files = {
 	...(args.skipScheduler
 		? {}
 		: { "worker.scheduler.ts": 'export * from "@h4-dev/scheduler/worker";' }),
+	...(args.skipViews ? {} : { "src/views/index.tsx": viewTs }),
 };
 
 for (const [filename, content] of Object.entries(files)) {

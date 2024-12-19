@@ -1,6 +1,14 @@
 import type { MatchedRoute, Server } from "bun";
 
-export type H4ControllerAction = () => Promise<Response> | Response;
+export type H4ControllerAction = () =>
+	| Promise<Response>
+	| Response
+	| ReturnType<H4BaseController["json"]>
+	| ReturnType<H4BaseController["html"]>
+	| ReturnType<H4BaseController["redirect"]>
+	| Promise<ReturnType<H4BaseController["json"]>>
+	| Promise<ReturnType<H4BaseController["html"]>>
+	| Promise<ReturnType<H4BaseController["redirect"]>>;
 
 export type H4MiddlewareHandler = () => void;
 
@@ -24,4 +32,26 @@ export abstract class H4BaseController {
 	put?: H4ControllerAction;
 	patch?: H4ControllerAction;
 	delete?: H4ControllerAction;
+
+	json<T>(data: T, { status = 200 } = {}) {
+		return { type: "json", data, status, location: undefined, html: undefined };
+	}
+
+	html(html: string, { status = 200 } = {}) {
+		return { type: "html", html, status, location: undefined, data: undefined };
+	}
+
+	redirect(location: string, { status = 302 } = {}) {
+		return {
+			type: "redirect",
+			location,
+			status,
+			html: undefined,
+			data: undefined,
+		};
+	}
+
+	compile(instance: { compile: () => string }, { status = 200 } = {}) {
+		return this.html(instance.compile(), { status });
+	}
 }
