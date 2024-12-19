@@ -2,6 +2,7 @@
 import { mkdir } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { write } from "bun";
+import { componentTs } from "./templates/component";
 import { controllerTs } from "./templates/controller";
 import { jobTs } from "./templates/job";
 import { modelTs } from "./templates/model";
@@ -26,6 +27,7 @@ const BASE_PATHS = {
 	model: "src/models",
 	job: "src/jobs",
 	view: "src/views",
+	component: "src/views/components",
 	migrate: "db/migrations",
 };
 
@@ -249,6 +251,42 @@ async function createView(name: string, fields: string[]) {
 	await createFile(viewFilePath, viewContent);
 }
 
+async function createComponent(name: string, fields: string[]) {
+	const parsedFieldsTS = fields.map((field) => {
+		const parts = field.split(":");
+		if (parts.length < 2) {
+			console.error(
+				COLOR.red(
+					`Error: Invalid field definition "${field}". Use name:type[:optional]`,
+				),
+			);
+			process.exit(1);
+		}
+
+		const fieldName = parts[0];
+		const fieldType = parts[1];
+		const isOptional = parts.includes("optional");
+
+		return isOptional
+			? `${fieldName}?: ${fieldType};`
+			: `${fieldName}: ${fieldType};`;
+	});
+
+	const propsType =
+		parsedFieldsTS.length > 0
+			? `{
+		${parsedFieldsTS.join("\n\t")}
+	}`
+			: undefined;
+
+	const componentFilePath = resolve(
+		BASE_PATHS.component,
+		`${formatToFileName(name)}.tsx`,
+	);
+	const componentContent = componentTs(formatToClassName(name), propsType);
+	await createFile(componentFilePath, componentContent);
+}
+
 function formatToClassName(input: string) {
 	return input
 		.replace(/[-_]+/g, " ")
@@ -307,6 +345,9 @@ if (command === "create") {
 			break;
 		case "view":
 			createView(name, fields);
+			break;
+		case "component":
+			createComponent(name, fields);
 			break;
 		default:
 			console.error(COLOR.red(`Error: Unknown type "${type}"`));

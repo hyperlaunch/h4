@@ -135,7 +135,7 @@ await mkdir(`${absoluteDir}/src/models`, { recursive: true });
 if (!args.skipFrontend)
 	await mkdir(`${absoluteDir}/src/frontend`, { recursive: true });
 if (!args.skipViews)
-	await mkdir(`${absoluteDir}/src/views`, { recursive: true });
+	await mkdir(`${absoluteDir}/src/views/components`, { recursive: true });
 await mkdir(`${absoluteDir}/public`, { recursive: true });
 await mkdir(`${absoluteDir}/db/migrations`, { recursive: true });
 
@@ -169,7 +169,6 @@ const files = {
 	...(!args.skipFrontend
 		? { "src/frontend/main.ts": mainTs, "src/frontend/main.css": mainCss }
 		: {}),
-	...(args.skipViews ? {} : { "src/views/.keep": "" }),
 	"public/.keep": "",
 	".gitignore": gitignore,
 	"tsconfig.json": JSON.stringify(
@@ -184,7 +183,9 @@ const files = {
 	...(args.skipScheduler
 		? {}
 		: { "worker.scheduler.ts": 'export * from "@h4-dev/scheduler/worker";' }),
-	...(args.skipViews ? {} : { "src/views/index.tsx": viewTs }),
+	...(args.skipViews
+		? {}
+		: { "src/views/index.tsx": viewTs, "src/views/components/.keep": "" }),
 };
 
 for (const [filename, content] of Object.entries(files)) {
