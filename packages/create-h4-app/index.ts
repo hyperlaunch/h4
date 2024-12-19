@@ -13,15 +13,17 @@ import { packageJson } from "./templates/package.json";
 import { readmeMd } from "./templates/readme.md";
 import { tsconfigJson } from "./templates/tsconfig.json";
 
-async function prompt(query: string) {
-	process.stdout.write(query);
-	const response = await new Promise<string>((resolve) => {
-		process.stdin.once("data", (data) => {
-			resolve(data.toString().trim());
-		});
-	});
-	return response;
-}
+const USAGE = `
+Usage:
+  bun x create-h4-app [options] <path>
+
+Options:
+  --skip-frontend      Exclude frontend files and directories.
+  --skip-queue         Exclude queue worker setup.
+  --skip-scheduler     Exclude scheduler worker setup.
+  --name=<name>        Set the project name explicitly.
+  --help               Show this help message.
+`;
 
 const COLOR = {
 	blue: (str: string) => `\x1b[34m${str}\x1b[0m`,
@@ -35,7 +37,6 @@ async function isDirectoryEmpty(path: string) {
 		const entries = Array.from(
 			new Glob(`${path}/*`).scanSync({ onlyFiles: false }),
 		);
-
 		return entries.length === 0;
 	} catch {
 		return true;
@@ -58,29 +59,55 @@ function getCurrentTimestamp() {
 		.slice(0, 14);
 }
 
-console.log(COLOR.cyan("\nWelcome to create-h4-app\n"));
+function parseArgs(args: string[]) {
+	const options: {
+		skipFrontend: boolean;
+		skipQueue: boolean;
+		skipScheduler: boolean;
+		name?: string;
+		path?: string;
+	} = {
+		skipFrontend: false,
+		skipQueue: false,
+		skipScheduler: false,
+	};
 
-const defaultDir = "./";
-const projectDir =
-	(await prompt(
-		`Where should we create your project? ${COLOR.blue(`(${defaultDir})`)} `,
-	)) || defaultDir;
+	for (let i = 0; i < args.length; i++) {
+		const arg = args[i];
+
+		if (arg.startsWith("--")) {
+			if (arg === "--skip-frontend") options.skipFrontend = true;
+			else if (arg === "--skip-queue") options.skipQueue = true;
+			else if (arg === "--skip-scheduler") options.skipScheduler = true;
+			else if (arg.startsWith("--name=")) options.name = arg.split("=")[1];
+			else if (arg === "--help") {
+				console.log(USAGE);
+				process.exit(0);
+			}
+		} else {
+			options.path = arg;
+		}
+	}
+
+	return options;
+}
+
+const args = parseArgs(process.argv.slice(2));
+
+if (!args.path) {
+	console.error(COLOR.red("Error: No path provided."));
+	console.log(USAGE);
+	process.exit(1);
+}
+
+const projectDir = String(args.path);
 const absoluteDir = `${process.cwd()}/${projectDir}`;
 
 const defaultName = formatProjectName(
-	projectDir === "./" ? "h4-app" : projectDir.split("/").pop() || "h4-app",
+	args.name ||
+		(projectDir === "./" ? "h4-app" : projectDir.split("/").pop() || "h4-app"),
 );
-const projectName =
-	(await prompt(
-		`What is your project named? ${COLOR.blue(`(${defaultName})`)} `,
-	)) || defaultName;
-
-const defaultApiOnlyAnswer = "N";
-const apiOnlyAnswer =
-	(await prompt(
-		`Is this an API only project? ${COLOR.blue(`(${defaultApiOnlyAnswer})`)} `,
-	)) || defaultApiOnlyAnswer;
-const apiOnly = apiOnlyAnswer === "Y";
+const projectName = args.name || defaultName;
 
 if (!(await isDirectoryEmpty(absoluteDir))) {
 	console.error(
@@ -96,33 +123,56 @@ await mkdir(absoluteDir, { recursive: true });
 await mkdir(`${absoluteDir}/src/controllers`, { recursive: true });
 await mkdir(`${absoluteDir}/storage`, { recursive: true });
 await mkdir(`${absoluteDir}/src/models`, { recursive: true });
-await mkdir(`${absoluteDir}/src/jobs`, { recursive: true });
-!apiOnly && (await mkdir(`${absoluteDir}/src/frontend`, { recursive: true }));
+!args.skipQueue &&
+	!args.skipScheduler &&
+	(await mkdir(`${absoluteDir}/src/jobs`, { recursive: true }));
+if (!args.skipFrontend)
+	await mkdir(`${absoluteDir}/src/frontend`, { recursive: true });
 await mkdir(`${absoluteDir}/public`, { recursive: true });
 await mkdir(`${absoluteDir}/db/migrations`, { recursive: true });
 
 const files = {
-	"package.json": JSON.stringify(packageJson(projectName, apiOnly), null, 2),
+	"package.json": JSON.stringify(
+		packageJson({
+			name: String(args.name),
+			skipFrontend: args.skipFrontend,
+			skipQueue: args.skipQueue,
+			skipScheduler: args.skipScheduler,
+		}),
+		null,
+		2,
+	),
 	"biome.json": JSON.stringify(biomeJson, null, 2),
-	"h4.config.ts": h4Config,
-	"index.ts": indexTs(apiOnly),
+	"h4.config.ts": h4Config({
+		skipQueue: args.skipQueue,
+	}),
+	"index.ts": indexTs({
+		skipFrontend: args.skipFrontend,
+		skipQueue: args.skipQueue,
+		skipScheduler: args.skipScheduler,
+	}),
 	"README.md": readmeMd(projectName),
 	"src/controllers/index.ts": controllerTs,
 	"src/models/.keep": "",
-	"src/jobs/.keep": "",
-	...(apiOnly
-		? {}
-		: { "src/frontend/main.ts": mainTs, "src/frontend/main.css": mainCss }),
+	...(args.skipQueue && args.skipScheduler ? {} : { "src/jobs/.keep": "" }),
+	...(!args.skipFrontend
+		? { "src/frontend/main.ts": mainTs, "src/frontend/main.css": mainCss }
+		: {}),
 	"public/.keep": "",
 	".gitignore": gitignore,
 	"tsconfig.json": JSON.stringify(tsconfigJson, null, 2),
 	[`db/migrations/${getCurrentTimestamp()}_genesis.sql`]: genesis,
-	"worker.queue.ts": 'export * from "@h4-dev/queue/worker";',
-	"worker.scheduler.ts": 'export * from "@h4-dev/scheduler/worker";',
+	...(args.skipQueue
+		? {}
+		: { "worker.queue.ts": 'export * from "@h4-dev/queue/worker";' }),
+	...(args.skipScheduler
+		? {}
+		: { "worker.scheduler.ts": 'export * from "@h4-dev/scheduler/worker";' }),
 };
 
-for (const [filename, content] of Object.entries(files))
+for (const [filename, content] of Object.entries(files)) {
 	await Bun.write(`${absoluteDir}/${filename}`, content);
+}
 
 console.log("\nInstalling dependencies...");
 const bunInstall = Bun.spawn(["bun", "install"], {

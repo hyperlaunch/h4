@@ -1,14 +1,24 @@
-export const packageJson = (name: string, apiOnly = false) => ({
+export const packageJson = ({
+	skipFrontend,
+	skipQueue,
+	skipScheduler,
+	name,
+}: {
+	skipFrontend: boolean;
+	skipQueue: boolean;
+	skipScheduler: boolean;
+	name: string;
+}) => ({
 	name,
 	type: "module",
 	dependencies: {
 		"@h4-dev/core": "{{version}}",
-		"@h4-dev/jobs": "{{version}}",
 		"@h4-dev/models": "{{version}}",
-		"@h4-dev/queue": "{{version}}",
-		"@h4-dev/scheduler": "{{version}}",
 		"@h4-dev/server": "{{version}}",
-		...(apiOnly ? {} : { "@h4-dev/frontend": "{{version}}" }),
+		...(skipQueue ? {} : { "@h4-dev/queue": "{{version}}" }),
+		...(skipScheduler ? {} : { "@h4-dev/scheduler": "{{version}}" }),
+		...(skipQueue && skipScheduler ? {} : { "@h4-dev/jobs": "{{version}}" }),
+		...(skipFrontend ? {} : { "@h4-dev/frontend": "{{version}}" }),
 	},
 	devDependencies: {
 		dbmate: "^2.24.0",

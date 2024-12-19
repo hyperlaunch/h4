@@ -10,7 +10,7 @@ const USAGE = `
 Usage:
   h4 create controller <path/to/controller>
   h4 create model <model-name> [field:type ...]
-  h4 create job <job-name>
+  h4 create job <job-name> [prop:type ...]
 `;
 
 const COLOR = {
