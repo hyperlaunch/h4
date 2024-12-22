@@ -10,7 +10,7 @@ import { viewTs } from "./templates/view"; // Assuming a template for views
 
 const USAGE = `
 Usage:
-  h4 create controller <path/to/controller>
+  h4 create controller <controller-class-name> <path/to/controller>
   h4 create model <model-name> [field:type ...]
   h4 create job <job-name> [prop:type ...]
   h4 create view <view-name> [prop:type ...]
@@ -65,9 +65,19 @@ async function createFile(filePath: string, content: string) {
 	console.log(COLOR.green(`Created: ${resolvedPath}`));
 }
 
-async function createController(path: string) {
+async function createController(name: string, path: string) {
+	if (!name || !path) {
+		console.error(
+			COLOR.red(
+				"Error: Both name and path are required for controller creation.",
+			),
+		);
+		console.log(USAGE);
+		process.exit(1);
+	}
+
 	const dirPath = resolve(BASE_PATHS.controller, path);
-	const controllerName = formatToClassName(basename(path));
+	const controllerName = formatToClassName(name);
 
 	await mkdir(dirPath, { recursive: true });
 
@@ -247,7 +257,10 @@ async function createView(name: string, fields: string[]) {
 	}`
 			: undefined;
 
-	const viewFilePath = resolve(BASE_PATHS.view, `${formatToFileName(name)}.ts`);
+	const viewFilePath = resolve(
+		BASE_PATHS.view,
+		`${formatToFileName(name)}.tsx`,
+	);
 	const viewContent = viewTs(formatToClassName(name), propsType);
 	await createFile(viewFilePath, viewContent);
 }
@@ -326,37 +339,70 @@ if (!command) {
 }
 
 if (command === "create") {
-	const [type, name, ...fields] = args;
+	const [type, name, path, ...restArgs] = args;
 
-	if (!type || !name) {
-		console.error(COLOR.red("Error: Missing arguments for `create` command"));
+	if (!type) {
+		console.error(
+			COLOR.red("Error: Missing type argument for `create` command."),
+		);
 		console.log(USAGE);
 		process.exit(1);
 	}
 
 	switch (type) {
 		case "controller":
-			createController(name);
+			if (!name || !path) {
+				console.error(
+					COLOR.red(
+						"Error: Name and path are required for controller creation.",
+					),
+				);
+				console.log(USAGE);
+				process.exit(1);
+			}
+			createController(name, path);
 			break;
 		case "model":
-			createModel(name, fields);
+			if (!name) {
+				console.error(COLOR.red("Error: Name is required for model creation."));
+				console.log(USAGE);
+				process.exit(1);
+			}
+			createModel(name, restArgs);
 			break;
 		case "job":
-			createJob(name, fields);
+			if (!name) {
+				console.error(COLOR.red("Error: Name is required for job creation."));
+				console.log(USAGE);
+				process.exit(1);
+			}
+			createJob(name, restArgs);
 			break;
 		case "view":
-			createView(name, fields);
+			if (!name) {
+				console.error(COLOR.red("Error: Name is required for view creation."));
+				console.log(USAGE);
+				process.exit(1);
+			}
+			createView(name, restArgs);
 			break;
 		case "component":
-			createComponent(name, fields);
+			if (!name) {
+				console.error(
+					COLOR.red("Error: Name is required for component creation."),
+				);
+				console.log(USAGE);
+				process.exit(1);
+			}
+			createComponent(name, restArgs);
 			break;
 		default:
-			console.error(COLOR.red(`Error: Unknown type "${type}"`));
+			console.error(COLOR.red(`Error: Unknown type "${type}".`));
 			console.log(USAGE);
 			process.exit(1);
 	}
 } else {
-	console.error(COLOR.red(`Error: Unknown command "${command}"`));
+	console.error(COLOR.red(`Error: Unknown command "${command}".`));
 	console.log(USAGE);
 	process.exit(1);
 }
