@@ -77,7 +77,7 @@ async function createController(path: string) {
 		process.exit(1);
 	}
 
-	const content = controllerTs(controllerName);
+	const content = controllerTs({ name: controllerName, path: dirPath });
 	await createFile(filePath, content);
 }
 

@@ -6,9 +6,11 @@ export type H4ControllerAction = () =>
 	| ReturnType<H4BaseController["json"]>
 	| ReturnType<H4BaseController["html"]>
 	| ReturnType<H4BaseController["redirect"]>
+	| ReturnType<H4BaseController["plain"]>
 	| Promise<ReturnType<H4BaseController["json"]>>
 	| Promise<ReturnType<H4BaseController["html"]>>
-	| Promise<ReturnType<H4BaseController["redirect"]>>;
+	| Promise<ReturnType<H4BaseController["redirect"]>>
+	| Promise<ReturnType<H4BaseController["plain"]>>;
 
 export type H4MiddlewareHandler = () => void;
 
@@ -34,11 +36,36 @@ export abstract class H4BaseController {
 	delete?: H4ControllerAction;
 
 	json<T>(data: T, { status = 200 } = {}) {
-		return { type: "json", data, status, location: undefined, html: undefined };
+		return {
+			type: "json",
+			data,
+			status,
+			location: undefined,
+			html: undefined,
+			text: undefined,
+		};
 	}
 
 	html(html: string, { status = 200 } = {}) {
-		return { type: "html", html, status, location: undefined, data: undefined };
+		return {
+			type: "html",
+			html,
+			status,
+			location: undefined,
+			data: undefined,
+			text: undefined,
+		};
+	}
+
+	plain(text: string, { status = 200 } = {}) {
+		return {
+			type: "plain",
+			text,
+			status,
+			location: undefined,
+			html: undefined,
+			data: undefined,
+		};
 	}
 
 	redirect(location: string, { status = 302 } = {}) {
@@ -48,6 +75,7 @@ export abstract class H4BaseController {
 			status,
 			html: undefined,
 			data: undefined,
+			text: undefined,
 		};
 	}
 

@@ -23,4 +23,6 @@ export const tsconfigJson = ({ skipViews }: { skipViews: boolean }) => ({
 		noUnusedParameters: false,
 		noPropertyAccessFromIndexSignature: false,
 	},
+	include: skipViews ? ["src/**/*.ts"] : ["src/**/*.ts", "src/**/*.tsx"],
+	exclude: ["node_modules"],
 });

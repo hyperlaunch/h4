@@ -1,9 +1,13 @@
-export const controllerTs = (
-	name: string,
-) => `import { H4BaseController } from "@h4-dev/server/controller";
+export const controllerTs = ({
+	name,
+	path,
+}: {
+	name: string;
+	path: string;
+}) => `import { H4BaseController } from "@h4-dev/server/controller";
 
 export default class ${name}Controller extends H4BaseController {
 	get = async () => {
-		return Response.json({ hello: "world" });
+		return this.plain("You can edit \`${name}Controller\` at ${path}");
 	};
 }`;

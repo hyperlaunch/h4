@@ -37,7 +37,12 @@ export const packageJson = ({
 	},
 	scripts: {
 		dev: "bun run --hot ./index.ts",
-		build: "bun build --compile ./index.ts --outfile release",
+		start: "NODE_ENV=production bun run ./index.ts",
+		"check:types": "tsc --noEmit",
+		...(skipViews ? {} : { "check:xss": "xss-scan --cwd ./src" }),
+		...(skipViews
+			? { check: "check:types" }
+			: { check: "bun run check:types && bun run check:xss" }),
 		dbmate: "DATABASE_URL='sqlite:storage/primary.db' dbmate",
 		fmt: "bun run biome check --write ./src",
 	},

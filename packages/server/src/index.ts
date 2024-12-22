@@ -91,6 +91,12 @@ export default function h4Server({
 										status: result.status,
 										headers: { "Content-Type": "text/html; charset=utf-8" },
 									});
+								case "plain":
+									logRequest(req, result.status);
+									return new Response(result.text, {
+										status: result.status,
+										headers: { "Content-Type": "text/plain; charset=utf-8" },
+									});
 								default:
 									logRequest(req, 500);
 									return new Response("Invalid response type", { status: 500 });
