@@ -1,3 +1,7 @@
+| ⚠️ On hold |
+| - |
+| Bun 1.2.3 and 1.2.4 brough some impressive new features forward, namely the [new bundler](https://bun.sh/blog/bun-v1.2.3#develop-frontend-apps-with-bun-index-html) and [built in router](https://bun.sh/blog/bun-v1.2.3#built-in-routing-for-bun-serve). This, in addition to the pending, mysterious "Framework API", have given me cause to pause development on H4 - until I know where it can add the most value above and beyond Bun's built-ins. |
+
 # h4
 
 h4 (short for Hyper, but can also mean Happy) is a batteries-included TypeScript framework built specifically for the Bun runtime. Taking inspiration from productive frameworks like Rails, Django, and Laravel, h4 provides a comprehensive suite of tools for building modern, "serverful" web applications with the DX of Typescript.
